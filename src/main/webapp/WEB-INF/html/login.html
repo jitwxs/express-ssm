@@ -1,0 +1,78 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <title>登陆 - 快递代拿系统</title>
+
+    <link rel="stylesheet" href="../../css/bootstrap.css"/>
+    <link rel="stylesheet" href="../../css/message.css"/>
+    <link rel="stylesheet" href="../../css/login.css"/>
+    <script src="../../js/jquery3.3.1.min.js"></script>
+    <script src="../../js/bootstrap.min.js"></script>
+    <script src="../../js/message.js"></script>
+    <script src="../../js/http.js"></script>
+</head>
+<body>
+<div class="container">
+    <div class="row">
+        <div class="col-md-offset-3 col-md-6">
+            <form class="form-horizontal">
+                <span class="heading">用户登录</span>
+                <div class="form-group">
+                    <input type="text" class="form-control" id="username" placeholder="用户名">
+                </div>
+                <div class="form-group help">
+                    <input type="password" class="form-control" id="password" placeholder="密码">
+                </div>
+                <div class="form-group help">
+                    <input type="text" class="form-control" id="inputVerify" placeholder="验证码">
+                </div>
+                <div class="form-group">
+                    <img src="getVerifyCode" title="看不清，请点我" onclick="refresh(this)" onmouseover="mouseover(this)"/>
+                    <button type="button" class="btn btn-default" onclick="submitLogin()">登录</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    function refresh(obj) {
+        obj.src = "getVerifyCode?" + Math.random();
+    }
+
+    function mouseover(obj) {
+        obj.style.cursor = "pointer";
+    }
+
+    function submitLogin() {
+        var username = $("#username").val();
+        var password = $("#password").val();
+        if(username === "" || password === "") {
+            $.message({message: "用户名或密码不能为空", type: "warning"});
+            return false;
+        }
+
+        sendJson("post", "/checkVerifyCode", {"data": $("#inputVerify").val()}, false, function (res) {
+            if (!res.status) {
+                $.message({message: res.info, type: 'error'});
+            } else {
+                sendJson("post", "/login", {"username":username,"password":password}, false, function (res) {
+                    if (!res.status) {
+                        $.message({message: res.info, type: 'error'});
+                    } else {
+                        window.location.href=res.data;
+                    }
+                }, function () {
+                    $.message({message: '未知错误', type: 'error'});
+                });
+            }
+        }, function () {
+            $.message({message: '未知错误', type: 'error'});
+        });
+    }
+</script>
+</body>
+</html>

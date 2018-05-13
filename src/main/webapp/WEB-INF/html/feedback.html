@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>意见反馈 - 快递代拿系统</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+
+    <link rel="stylesheet" href="../../css/bootstrap.css"/>
+    <link rel="stylesheet" href="../../css/message.css"/>
+    <script src="../../js/jquery3.3.1.min.js"></script>
+    <script src="../../js/bootstrap.min.js"></script>
+    <script src="../../js/message.js"></script>
+    <script src="../../js/http.js"></script>
+</head>
+<body>
+<!-- 导航栏 -->
+<div class="container">
+    <nav class="navbar navbar-default">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="#">意见反馈</a>
+            </div>
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav navbar-right">
+                    <li style="margin-right: 6px;">
+                        <a href="/">首页</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+</div>
+
+<div class="container">
+    <form class="form-horizontal">
+        <div class="form-group">
+            <label class="col-sm-1 control-label" for="inputType">反馈类型</label>
+            <div class="col-sm-11">
+                <select class="form-control" name="type" id="inputType">
+                    <option value="1">订单反馈</option>
+                    <option value="2">意见反馈</option>
+                    <option value="3">BUG反馈</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="inputName" class="col-sm-1 control-label">姓名</label>
+            <div class="col-sm-11">
+                <input type="text" class="form-control" id="inputName" name="name" required="required" placeholder="我该如何称呼你">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="inputTel" class="col-sm-1 control-label">联系电话</label>
+            <div class="col-sm-11">
+                <input type="tel" class="form-control" id="inputTel" name="tel" required="required" placeholder="请输入联系电话">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="inputInfo" class="col-sm-1 control-label">反馈内容</label>
+            <div class="col-sm-11">
+                <textarea class="form-control" id="inputInfo" name="info" rows="2" required="required" placeholder="请输入反馈的内容"></textarea>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="inputVerify" class="col-sm-1 control-label">验证码</label>
+            <div class="col-sm-6">
+                <input type="text" class="form-control" id="inputVerify" name="inputVerify" required="required" placeholder="请输入验证码">
+            </div>
+            <div class="col-sm-5"  style="margin-top: 10px">
+                <img src="getVerifyCode" title="看不清，请点我" onclick="refresh(this)" onmouseover="mouseover(this)" />
+            </div>
+        </div>
+        <div class="form-group" style="text-align: center">
+            <button class="btn btn-primary" type="button" onclick="submitFeedback()">提交反馈</button>
+            <button class="btn btn-warning" type="reset">重新填写</button>
+        </div>
+    </form>
+</div>
+
+<script>
+    function refresh(obj) {
+        obj.src = "getVerifyCode?" + Math.random();
+    }
+
+    function mouseover(obj) {
+        obj.style.cursor = "pointer";
+    }
+
+    function submitFeedback() {
+        var reg = /^1[0-9]{10}$/;
+        var phoneNum = $("#inputTel").val();
+        var verify = $("#inputVerify").val();
+
+        var flag = reg.test(phoneNum);
+        if(!flag) {
+            $.message({
+                message:'号码不符合规范',
+                type:'warning'
+            });
+            return false;
+        }
+
+        $.ajax({
+            url : "/checkVerifyCode",
+            type : "post",
+            dataType : "json",
+            data : {
+                "data": verify
+            },
+            async :false,
+            success : function(res) {
+                if(!res.data) {
+                    flag = false;
+                    $.message({
+                        message:'验证码错误',
+                        type:'error'
+                    });
+                }
+            },
+            error: function() {
+                flag = false;
+                $.message({
+                    message: '未知错误',
+                    type: 'error'
+                });
+            }
+        });
+        return flag;
+    }
+</script>
+</body>
+</html>

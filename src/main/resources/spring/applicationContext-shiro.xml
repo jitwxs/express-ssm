@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans.xsd
+	http://www.springframework.org/schema/context
+	http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <!-- 组件扫描器 -->
+    <context:component-scan base-package="jit.wxs.express.realm" />
+
+    <!-- Shiro过滤器 -->
+    <bean id="shiroFilter" class="org.apache.shiro.spring.web.ShiroFilterFactoryBean">
+        <property name="securityManager" ref="securityManager" />
+
+        <!-- 登录页面地址，默认会自动寻找Web工程根目录下的"/login.jsp"页面 -->
+        <property name="loginUrl" value="/"/>
+
+        <property name="filterChainDefinitions">
+            <value>
+                #这里相当于ini配置文件中的[urls]
+                #url=拦截器[参数]，拦截器
+                # 如果用户没有该角色，然后访问该路径会报 401错误
+
+                /admin/** = authc, roles[admin]
+                /staff/** = authc, roles[staff]
+
+                # 匿名请求请求列表
+                # 登陆请求
+                /login = anon
+                # 验证码
+                /getVerifyCode = anon
+                /checkVerifyCode = anon
+                # 注销请求
+                /logout = logout
+
+                # 静态资源
+                /css/** = anon
+                /js/** = anon
+
+                # 配置为 anon 可以匿名访问，否则都需要登录访问，如果没登录会跳转到 /login 登录
+                /** = authc
+            </value>
+        </property>
+    </bean>
+
+    <!-- 配置securityManager -->
+    <bean id="securityManager" class="org.apache.shiro.web.mgt.DefaultWebSecurityManager">
+        <!-- 配置自定义Realm -->
+        <property name="realm" ref="loginRealm" />
+    </bean>
+
+    <!-- 生命周期 -->
+    <bean id="lifecycleBeanPostProcessor" class="org.apache.shiro.spring.LifecycleBeanPostProcessor" />
+
+    <!-- 启用shiro注解 -->
+    <bean class="org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator" depends-on="lifecycleBeanPostProcessor"/>
+    <bean class="org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor">
+        <property name="securityManager" ref="securityManager"/>
+    </bean>
+
+</beans>
