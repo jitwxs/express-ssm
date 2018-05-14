@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <title>支付结果 - 快递代拿系统</title>
+    <link rel="stylesheet" href="../../css/bootstrap.css"/>
+    <link rel="stylesheet" href="../../css/message.css"/>
+    <link rel="stylesheet" href="../../css/express.css"/>
+</head>
+<body>
+<div class="container">
+    <!-- 导航栏 -->
+    <nav class="navbar navbar-default">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+                        data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand">快递代拿信息填写</a>
+            </div>
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav navbar-right">
+                    <li><a href="/search">查询中心</a></li>
+                    <li><a href="/feedback">意见反馈</a></li>
+                    <li><a href="/login">登陆系统</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <!-- 主体部分 -->
+    <div class="panel">
+        <div class="panel-heading">
+            <h3>下单成功</h3>
+        </div>
+        <div class="panel-body">
+            <div>
+                您的订单已经通知提交成功，请牢记您的订单号，方便查询进度与反馈。
+                订单号：<span class="red-span" id="expressId"></span>
+            </div>
+            <div style="margin-top: 50px;">
+                <a href="/">返回首页</a>
+                <a href="#">查询进度</a>
+            </div>
+        </div>
+    </div>
+<script src="../../js/jquery3.3.1.min.js"></script>
+<script src="../../js/bootstrap.min.js"></script>
+<script src="../../js/message.js"></script>
+<script src="../../js/http.js"></script>
+<script>
+    $(function () {
+        sendJson("get", "/payment/result/info", {}, false, function (res) {
+            if (!res.status) {
+                $.message({message: "订单已失效，请刷新页面。如无法解决，请重新下单", type: 'error'});
+            } else {
+                var payment = res.data;
+                $("#expressId").text(payment.expressId);
+            }
+        }, function () {
+            $.message({message: '未知错误', type: 'error'});
+        });
+    });
+</script>
+</div>
+</body>
+</html>

@@ -7,12 +7,8 @@
     <title>首页 - 快递代拿系统</title>
     <link rel="stylesheet" href="../../css/bootstrap.css"/>
     <link rel="stylesheet" href="../../css/message.css"/>
-    <script src="../../js/jquery3.3.1.min.js"></script>
-    <script src="../../js/bootstrap.min.js"></script>
-    <script src="../../js/message.js"></script>
-    <script src="../../js/http.js"></script>
+    <link rel="stylesheet" href="../../css/express.css"/>
 </head>
-<body>
 <body>
 <!-- 导航栏 -->
 <div class="container">
@@ -30,6 +26,7 @@
             </div>
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                 <ul class="nav navbar-nav navbar-right">
+                    <li><a href="/search">查询中心</a></li>
                     <li><a href="/feedback">意见反馈</a></li>
                     <li><a href="/login">登陆系统</a></li>
                 </ul>
@@ -38,7 +35,7 @@
     </nav>
 </div>
 
-<!-- 表单 -->
+<!-- 主体 -->
 <div class="container">
     <form class="form-horizontal" id="expressForm">
         <div class="form-group">
@@ -56,28 +53,28 @@
         <div class="form-group">
             <label for="inputInfo" class="col-sm-1 control-label">取件短信</label>
             <div class="col-sm-11">
-                <textarea class="form-control dis_change_textarea" id="inputInfo" name="message" rows="2"
+                <textarea class="form-control dis_change_textarea" id="inputInfo" name="message" rows="5"
                           placeholder="请直接复制取件短信（一个快递一个订单）"></textarea>
             </div>
         </div>
         <div class="form-group">
             <label for="inputAddress" class="col-sm-1 control-label">配送地址</label>
             <div class="col-sm-11">
-                <textarea class="form-control dis_change_textarea" id="inputAddress" name="address" rows="2"
+                <textarea class="form-control dis_change_textarea" id="inputAddress" name="address" rows="5"
                           placeholder="请输入配送地址"></textarea>
             </div>
         </div>
         <div class="form-group">
-            <label for="inputRemark" class="col-sm-1 control-label">备注</label>
+            <label for="inputRemark" class="col-sm-1 control-label">备注（可选）</label>
             <div class="col-sm-11">
-                <textarea class="form-control dis_change_textarea" id="inputRemark" name="remark" rows="2"
+                <textarea class="form-control dis_change_textarea" id="inputRemark" name="remark" rows="5"
                           placeholder="如果有特殊要求，请备注于此"></textarea>
             </div>
         </div>
         <div class="form-group">
             <label for="inputVerify" class="col-sm-1 control-label">验证码</label>
             <div class="col-sm-6">
-                <input type="text" class="form-control" id="inputVerify" placeholder="请输入验证码">
+                <input type="text" class="form-control" id="inputVerify" name="verify" placeholder="请输入验证码">
             </div>
             <div class="col-sm-5" style="margin-top: 10px">
                 <img id="verifyCode" src="getVerifyCode" title="看不清，请点我" onclick="refresh(this)"
@@ -85,11 +82,16 @@
             </div>
         </div>
         <div class="form-group" style="text-align: center">
-            <button class="btn btn-primary" type="button" onclick="submitExpress()">立即下单</button>
+            <button class="btn btn-primary" type="submit">前往支付</button>
             <button class="btn btn-warning" type="reset">重新填写</button>
         </div>
     </form>
 </div>
+<script src="../../js/jquery3.3.1.min.js"></script>
+<script src="../../js/jquery.validate.min.js"></script>
+<script src="../../js/bootstrap.min.js"></script>
+<script src="../../js/message.js"></script>
+<script src="../../js/http.js"></script>
 <script type="text/javascript">
     function refresh(obj) {
         obj.src = "getVerifyCode?" + Math.random();
@@ -99,49 +101,49 @@
         obj.style.cursor = "pointer";
     }
 
-    function submitExpress() {
-        if (!dataVerify()) {
-            return false;
-        }
-
-        sendJson("post", "/checkVerifyCode", {"data": $("#inputVerify").val()}, false, function (res) {
-            if (!res.status) {
-                $.message({message: res.info, type: 'error'});
-            } else {
-                sendJson("post", "/express", $("#expressForm").serialize(), false, function (res) {
+    $().ready(function() {
+         $("#expressForm").validate({
+            rules: {
+                name: "required",
+                tel: {
+                    required: true,
+                    minlength: 11
+                },
+                message: "required",
+                address: "required",
+                verify: "required"
+            },
+            messages: {
+                name: "取件姓名不能为空",
+                tel: {
+                    required: "联系电话不能为空",
+                    minlength: "手机号码不少于11位"
+                },
+                message: "取件短信不能为空",
+                address: "配送地址不能为空",
+                verify: "验证码不能为空"
+            },
+            submitHandler: function (form) {
+                sendJson("post", "/checkVerifyCode", {"data": $("#inputVerify").val()}, false, function (res) {
                     if (!res.status) {
                         $.message({message: res.info, type: 'error'});
                     } else {
-                        $.message({message: "下单成功", type: 'success'});
+                        sendJson("post", "/express", $("#expressForm").serialize(), false, function (res) {
+                            if (!res.status) {
+                                $.message({message: res.info, type: 'error'});
+                            } else {
+                                window.location.href = res.data;
+                            }
+                        }, function () {
+                            $.message({message: '未知错误', type: 'error'});
+                        });
                     }
                 }, function () {
                     $.message({message: '未知错误', type: 'error'});
                 });
             }
-        }, function () {
-            $.message({message: '未知错误', type: 'error'});
         });
-    }
-
-    // 数据验证
-    function dataVerify() {
-        var reg = /^1[0-9]{10}$/;
-        var phoneNum = $("#inputTel").val();
-        var verify = $("#inputVerify").val();
-
-        var flag = reg.test(phoneNum);
-        if (!flag) {
-            $.message({message: '号码不符合规范', type: 'warning'});
-            return false;
-        }
-
-        if (verify === "") {
-            $.message({message: '验证码不能为空', type: 'warning'});
-            return false;
-        }
-
-        return true;
-    }
+    });
 </script>
 </body>
 </html>

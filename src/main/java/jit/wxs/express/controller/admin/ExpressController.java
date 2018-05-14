@@ -49,19 +49,31 @@ public class ExpressController {
         ExpressDto dto = new ExpressDto();
         BeanUtils.copyProperties(express,dto);
 
-        // 设置配送人员名称
+        // 设置配送人员信息
         if(StringUtils.isNotBlank(dto.getStaff())) {
             SysUser user = userService.selectById(dto.getStaff());
-            dto.setStaffName(user.getUsername());
+            if(user.getUsername() != null) {
+                dto.setStaffName(user.getUsername());
+            }
+            if(user.getTel() != null) {
+                dto.setStaffTel(user.getTel());
+            }
         }
 
-        // 设置订单状态名称
-        dto.setStatusName(ExpressStatusEnum.getName(dto.getStatus()));
+        // 设置订单状态
+        dto.setStatusName(ExpressStatusEnum.getName(express.getStatus()));
 
-        // 设置订单支付方式
-        ExpressPayment expressPayment = expressPaymentService.selectById(dto.getId());
-        if(expressPayment != null) {
-            dto.setPaymentType(PaymentEnum.getName(expressPayment.getType()));
+        // 设置订单支付信息
+        ExpressPayment payment = expressPaymentService.selectById(express.getId());
+        if(payment != null) {
+            dto.setPaymentType(PaymentEnum.getName(payment.getType()));
+            if(payment.getOnlinePayment() != null) {
+                dto.setOnlinePayment(payment.getOnlinePayment());
+            }
+
+            if(payment.getOfflinePayment() != null) {
+                dto.setOfflinePayment(payment.getOfflinePayment());
+            }
         }
         return dto;
     }
@@ -71,7 +83,7 @@ public class ExpressController {
      * @author jitwxs
      * @since 2018/5/13 15:50
      */
-    public EntityWrapper<Express> getExpressWrapper(ExpressSelectWrapper esw) {
+    private EntityWrapper<Express> getExpressWrapper(ExpressSelectWrapper esw) {
         EntityWrapper<Express> entityWrapper = new EntityWrapper<>();
         // 前台传递，状态-1表示所有状态
         if(esw.getStatus() != null && esw.getStatus() != -1) {
@@ -103,6 +115,23 @@ public class ExpressController {
     }
 
     /**
+     * 获取订单的状态列表
+     * @author jitwxs
+     * @since 2018/5/2 9:58
+     */
+    @GetMapping("/status")
+    public Msg listExpressStatus() {
+        List<Map<String,Object>> result = new ArrayList<>();
+        for(ExpressStatusEnum enums :ExpressStatusEnum.values()) {
+            Map<String,Object> map = new HashMap<>();
+            map.put("id",enums.getIndex());
+            map.put("name",enums.getName());
+            result.add(map);
+        }
+        return Msg.ok(null,result);
+    }
+
+    /**
      * 订单列表
      * @param esw 筛选条件
      * @author jitwxs
@@ -123,8 +152,6 @@ public class ExpressController {
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
-        // 仅查看非删除订单
-        esw.setHasDelete(false);
         // 得到筛选条件
         EntityWrapper<Express> expressWrapper = getExpressWrapper(esw);
         Page<Express> selectPage = expressService.selectPage(new Page<>(page, rows), expressWrapper);
@@ -222,6 +249,37 @@ public class ExpressController {
                 express.setHasDelete(true);
                 expressService.updateById(express);
             }
+        }
+        return Msg.ok();
+    }
+
+    /**
+     * 恢复订单
+     * @author jitwxs
+     * @since 2018/5/2 14:05
+     */
+    @PostMapping("/recycle")
+    public Msg recycleById(String[] ids) {
+        for(String id : ids) {
+            Express express = expressService.selectById(id);
+            if(express != null) {
+                // 设置删除标记为false
+                express.setHasDelete(false);
+                expressService.updateById(express);
+            }
+        }
+        return Msg.ok();
+    }
+
+    /**
+     * 彻底删除订单
+     * @author jitwxs
+     * @since 2018/5/2 14:05
+     */
+    @PostMapping("/clean")
+    public Msg cleanById(String[] ids) {
+        for(String id : ids) {
+            expressService.deleteById(id);
         }
         return Msg.ok();
     }

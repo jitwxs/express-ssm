@@ -8,14 +8,11 @@
 
     <link rel="stylesheet" href="../../css/bootstrap.css"/>
     <link rel="stylesheet" href="../../css/message.css"/>
-    <script src="../../js/jquery3.3.1.min.js"></script>
-    <script src="../../js/bootstrap.min.js"></script>
-    <script src="../../js/message.js"></script>
-    <script src="../../js/http.js"></script>
+    <link rel="stylesheet" href="../../css/express.css"/>
 </head>
 <body>
-<!-- 导航栏 -->
 <div class="container">
+    <!-- 导航栏 -->
     <nav class="navbar navbar-default">
         <div class="container-fluid">
             <div class="navbar-header">
@@ -29,17 +26,15 @@
             </div>
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                 <ul class="nav navbar-nav navbar-right">
-                    <li style="margin-right: 6px;">
-                        <a href="/">首页</a>
-                    </li>
+                    <li><a href="/">首页</a></li>
+                    <li><a href="/search">查询中心</a></li>
+                    <li><a href="/login">登陆系统</a></li>
                 </ul>
             </div>
         </div>
     </nav>
-</div>
-
-<div class="container">
-    <form class="form-horizontal">
+    <!-- 主体 -->
+    <form class="form-horizontal" id="feedbackForm">
         <div class="form-group">
             <label class="col-sm-1 control-label" for="inputType">反馈类型</label>
             <div class="col-sm-11">
@@ -53,87 +48,101 @@
         <div class="form-group">
             <label for="inputName" class="col-sm-1 control-label">姓名</label>
             <div class="col-sm-11">
-                <input type="text" class="form-control" id="inputName" name="name" required="required" placeholder="我该如何称呼你">
+                <input type="text" class="form-control" id="inputName" name="name" placeholder="我该如何称呼你">
             </div>
         </div>
         <div class="form-group">
             <label for="inputTel" class="col-sm-1 control-label">联系电话</label>
             <div class="col-sm-11">
-                <input type="tel" class="form-control" id="inputTel" name="tel" required="required" placeholder="请输入联系电话">
+                <input type="tel" class="form-control" id="inputTel" name="tel" placeholder="请输入联系电话">
             </div>
         </div>
         <div class="form-group">
-            <label for="inputInfo" class="col-sm-1 control-label">反馈内容</label>
+            <label for="inputMessage" class="col-sm-1 control-label">反馈内容</label>
             <div class="col-sm-11">
-                <textarea class="form-control" id="inputInfo" name="info" rows="2" required="required" placeholder="请输入反馈的内容"></textarea>
+                <textarea class="form-control" id="inputMessage" name="message" rows="5"
+                          placeholder="请输入反馈的内容，如果牵扯到订单，请说明订单号"></textarea>
             </div>
         </div>
         <div class="form-group">
             <label for="inputVerify" class="col-sm-1 control-label">验证码</label>
             <div class="col-sm-6">
-                <input type="text" class="form-control" id="inputVerify" name="inputVerify" required="required" placeholder="请输入验证码">
+                <input type="text" class="form-control" id="inputVerify" name="verify" placeholder="请输入验证码">
             </div>
             <div class="col-sm-5"  style="margin-top: 10px">
-                <img src="getVerifyCode" title="看不清，请点我" onclick="refresh(this)" onmouseover="mouseover(this)" />
+                <img id="verifyImg" src="getVerifyCode" title="看不清，请点我" onclick="refresh(this)" onmouseover="mouseover(this)" />
             </div>
         </div>
         <div class="form-group" style="text-align: center">
-            <button class="btn btn-primary" type="button" onclick="submitFeedback()">提交反馈</button>
+            <button class="btn btn-primary" type="submit">提交反馈</button>
             <button class="btn btn-warning" type="reset">重新填写</button>
         </div>
     </form>
+    <div>
+        <label id="feedbackResult"></label>
+    </div>
 </div>
 
+<script src="../../js/jquery3.3.1.min.js"></script>
+<script src="../../js/jquery.validate.min.js"></script>
+<script src="../../js/bootstrap.min.js"></script>
+<script src="../../js/message.js"></script>
+<script src="../../js/http.js"></script>
 <script>
     function refresh(obj) {
         obj.src = "getVerifyCode?" + Math.random();
     }
-
     function mouseover(obj) {
         obj.style.cursor = "pointer";
     }
 
-    function submitFeedback() {
-        var reg = /^1[0-9]{10}$/;
-        var phoneNum = $("#inputTel").val();
-        var verify = $("#inputVerify").val();
-
-        var flag = reg.test(phoneNum);
-        if(!flag) {
-            $.message({
-                message:'号码不符合规范',
-                type:'warning'
-            });
-            return false;
-        }
-
-        $.ajax({
-            url : "/checkVerifyCode",
-            type : "post",
-            dataType : "json",
-            data : {
-                "data": verify
+    $().ready(function() {
+        $("#feedbackForm").validate({
+            rules: {
+                name: "required",
+                tel: {
+                    required: true,
+                    minlength: 11
+                },
+                message: "required",
+                verify: "required"
             },
-            async :false,
-            success : function(res) {
-                if(!res.data) {
-                    flag = false;
-                    $.message({
-                        message:'验证码错误',
-                        type:'error'
-                    });
-                }
+            messages: {
+                name: "姓名不能为空",
+                tel: {
+                    required: "联系电话不能为空",
+                    minlength: "手机号码不少于11位"
+                },
+                message: "反馈内容不能为空",
+                verify: "验证码不能为空"
             },
-            error: function() {
-                flag = false;
-                $.message({
-                    message: '未知错误',
-                    type: 'error'
+            submitHandler: function (form) {
+                sendJson("post", "/checkVerifyCode", {"data": $("#inputVerify").val()}, false, function (res) {
+                    if (!res.status) {
+                        $.message({message: res.info, type: 'error'});
+                    } else {
+                        sendJson("post", "/feedback", $("#feedbackForm").serialize(), false, function (res) {
+                            if (!res.status) {
+                                $.message({message: res.info, type: 'error'});
+                            } else {
+                                $("#feedbackResult").html(
+                                    '反馈成功，您的反馈号是：<span class="red-span">'+res.data+'</span>,以方便您查询反馈进度'
+                                );
+                                // 重置表单
+                                $("#feedbackForm")[0].reset();
+                                // 刷新验证码
+                                refresh(document.getElementById("verifyImg"));
+                            }
+                        }, function () {
+                            $.message({message: '未知错误', type: 'error'});
+                        });
+                    }
+                }, function () {
+                    $.message({message: '未知错误', type: 'error'});
                 });
             }
         });
-        return flag;
-    }
+    });
 </script>
 </body>
 </html>

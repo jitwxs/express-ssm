@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <title>查询中心 - 快递代拿系统</title>
+    <link rel="stylesheet" href="../../css/bootstrap.css"/>
+    <link rel="stylesheet" href="../../css/message.css"/>
+    <link rel="stylesheet" href="../../css/express.css"/>
+</head>
+<body>
+<div class="container">
+    <!-- 导航栏 -->
+    <nav class="navbar navbar-default">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+                        data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand">快递代拿信息填写</a>
+            </div>
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav navbar-right">
+                    <li><a href="/">首页</a></li>
+                    <li><a href="/feedback">意见反馈</a></li>
+                    <li><a href="/login">登陆系统</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <!-- 搜索框 -->
+    <div class="input-group col-sm-offset-3 col-sm-6">
+        <span class="input-group-addon">订单号或反馈号</span>
+        <input type="text" class="form-control" aria-label="search" id="inputSearch">
+        <span class="input-group-btn">
+            <button class="btn btn-default" type="button" onclick="search()">查询</button>
+        </span>
+    </div>
+    <!-- 查询结果 -->
+    <div class="panel">
+        <!-- 订单信息 -->
+        <div id="expressPanel" class="panel-body hidden">
+            <div>
+                <h4>订单信息</h4>
+                <form class="form-horizontal">
+                    <div class="form-group">
+                        <label for="expressName" class="col-sm-2 control-label">姓名</label>
+                        <div class="col-sm-10">
+                            <p class="form-control-static" id="expressName"></p>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="expressTel" class="col-sm-2 control-label">联系电话</label>
+                        <div class="col-sm-10">
+                            <p class="form-control-static" id="expressTel"></p>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="expressAddress" class="col-sm-2 control-label">配送地址</label>
+                        <div class="col-sm-10">
+                            <p class="form-control-static" id="expressAddress"></p>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="expressMessage" class="col-sm-2 control-label">取件短信</label>
+                        <div class="col-sm-10">
+                            <p class="form-control-static" id="expressMessage"></p>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="expressRemark" class="col-sm-2 control-label">备注</label>
+                        <div class="col-sm-10">
+                            <p class="form-control-static" id="expressRemark"></p>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="expressPaymentType" class="col-sm-2 control-label">支付方式</label>
+                        <div class="col-sm-10">
+                            <p class="form-control-static" id="expressPaymentType"></p>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="expressOnline" class="col-sm-2 control-label">线上支付金额</label>
+                        <div class="col-sm-10">
+                            <p class="form-control-static" id="expressOnline"></p>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="expressOffline" class="col-sm-2 control-label">线下支付金额</label>
+                        <div class="col-sm-10">
+                            <p class="form-control-static" id="expressOffline"></p>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <br>
+            <div>
+                <h4>订单状态</h4>
+                <form class="form-horizontal">
+                    <div class="form-group">
+                        <label for="expressStatus" class="col-sm-2 control-label">当前状态</label>
+                        <div class="col-sm-10">
+                            <p class="form-control-static" id="expressStatus" style="color:red;"></p>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="expressStaff" class="col-sm-2 control-label">配送员</label>
+                        <div class="col-sm-10">
+                            <p class="form-control-static" id="expressStaff"></p>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="expressStaffTel" class="col-sm-2 control-label">联系电话</label>
+                        <div class="col-sm-10">
+                            <p class="form-control-static" id="expressStaffTel"></p>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="expressStaffRemark" class="col-sm-2 control-label">配送反馈</label>
+                        <div class="col-sm-10">
+                            <p class="form-control-static" id="expressStaffRemark"></p>
+                        </div>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+        <!-- 反馈信息 -->
+        <div id="feedbackPanel" class="panel-body hidden">
+            <div>
+                <h4>反馈信息</h4>
+                <form class="form-horizontal">
+                    <div class="form-group">
+                        <label for="feedbackName" class="col-sm-2 control-label">姓名</label>
+                        <div class="col-sm-10">
+                            <p class="form-control-static" id="feedbackName"></p>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="feedbackTel" class="col-sm-2 control-label">联系电话</label>
+                        <div class="col-sm-10">
+                            <p class="form-control-static" id="feedbackTel"></p>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="feedbackType" class="col-sm-2 control-label">反馈类型</label>
+                        <div class="col-sm-10">
+                            <p class="form-control-static" id="feedbackType"></p>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="feedbackMessage" class="col-sm-2 control-label">反馈内容</label>
+                        <div class="col-sm-10">
+                            <p class="form-control-static" id="feedbackMessage"></p>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="feedbackCreate" class="col-sm-2 control-label">反馈时间</label>
+                        <div class="col-sm-10">
+                            <p class="form-control-static" id="feedbackCreate"></p>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <br>
+            <div>
+                <h4>反馈状态</h4>
+                <form class="form-horizontal">
+                    <div class="form-group">
+                        <label for="feedbackStatus" class="col-sm-2 control-label">反馈状态</label>
+                        <div class="col-sm-10">
+                            <p class="form-control-static" id="feedbackStatus" style="color: red"></p>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="feedbackStaff" class="col-sm-2 control-label">处理人</label>
+                        <div class="col-sm-10">
+                            <p class="form-control-static" id="feedbackStaff"></p>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="feedbackResult" class="col-sm-2 control-label">处理结果</label>
+                        <div class="col-sm-10">
+                            <p class="form-control-static" id="feedbackResult"></p>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="feedbackUpdate" class="col-sm-2 control-label">处理时间</label>
+                        <div class="col-sm-10">
+                            <p class="form-control-static" id="feedbackUpdate"></p>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="../../js/jquery3.3.1.min.js"></script>
+<script src="../../js/bootstrap.min.js"></script>
+<script src="../../js/message.js"></script>
+<script src="../../js/http.js"></script>
+<script type="text/javascript">
+    function search() {
+        var content = $("#inputSearch").val();
+        if(content === "") {
+            $.message({message: '查询内容不能为空', type: 'warning'});
+        }
+        sendJson("post", "/search", {"id":content}, false, function (res) {
+            if (!res.status) {
+                $.message({message: res.info, type: 'error'});
+            } else {
+                // 0:订单信息;1:反馈信息
+                var type = res.info;
+                if(type === "0") {
+                    express = res.data;
+                    $("#expressName").text(express.name);
+                    $("#expressTel").text(express.tel);
+                    $("#expressAddress").text(express.address);
+                    $("#expressMessage").text(express.message);
+                    $("#expressRemark").text(express.remark);
+                    $("#expressPaymentType").text(express.paymentType);
+                    $("#expressOnline").text(express.onlinePayment);
+                    $("#expressOffline").text(express.offlinePayment);
+
+                    $("#expressStatus").text(express.statusName);
+                    $("#expressStaff").text(express.staffName);
+                    $("#expressStaffTel").text(express.staffTel);
+                    $("#expressStaffRemark").text(express.staffRemark);
+                } else if(type === "1") {
+                    feedback = res.data;
+                    $("#feedbackName").text(feedback.name);
+                    $("#feedbackTel").text(feedback.tel);
+                    $("#feedbackType").text(feedback.typeName);
+                    $("#feedbackMessage").text(feedback.message);
+                    $("#feedbackCreate").text(feedback.createDate);
+
+                    $("#feedbackStatus").text(feedback.statusName);
+                    $("#feedbackStaff").text(feedback.staffName);
+                    $("#feedbackResult").text(feedback.result);
+                    $("#feedbackUpdate").text(feedback.updateDate);
+                }
+                parserPanel(type);
+            }
+        }, function () {
+            $.message({message: '未知错误', type: 'error'});
+        });
+    }
+    
+    function parserPanel(type) {
+        // 0:订单信息;1:反馈信息
+        if(type === "0") {
+            // 打开expressPanel,关闭feedbackPanel
+            if($("#expressPanel").hasClass("hidden")) {
+                $("#expressPanel").removeClass("hidden");
+            }
+            if(!$("#feedbackPanel").hasClass("hidden")) {
+                $("#feedbackPanel").addClass("hidden");
+            }
+        } else if(type === "1") {
+            // 打开feedbackPanel,关闭expressPanel
+            if($("#feedbackPanel").hasClass("hidden")) {
+                $("#feedbackPanel").removeClass("hidden");
+            }
+            if(!$("#expressPanel").hasClass("hidden")) {
+                $("#expressPanel").addClass("hidden");
+            }
+        }
+    }
+</script>
+</body>
+</html>

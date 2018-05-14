@@ -25,8 +25,33 @@ public class PageController {
         return "feedback";
     }
 
+    @GetMapping("/search")
+    public String showSearch() {
+        return "search";
+    }
+
+    @GetMapping("/payment")
+    public String showPayment() {
+        return "payment";
+    }
+
+    @GetMapping("/payment/result")
+    public String showPaymentResult() {
+        return "payment_result";
+    }
+
     @GetMapping("/admin/express")
     public String showExpress() {
         return "admin/express";
+    }
+
+    @GetMapping("/admin/expressRecycle")
+    public String showExpressRecycle() {
+        return "admin/expressRecycle";
+    }
+
+    @GetMapping("/admin/staff")
+    public String showStaff() {
+        return "admin/staff";
     }
 }

@@ -9,11 +9,7 @@
     <link rel="stylesheet" href="../../../css/bootstrap.css"/>
     <link rel="stylesheet" href="../../../css/bootstrap-table.css"/>
     <link rel="stylesheet" href="../../../css/message.css"/>
-    <style>
-        .ml10 {
-            margin-left: 10px;
-        }
-    </style>
+    <link rel="stylesheet" href="../../../css/express.css">
 </head>
 <body>
 <div class="container-fluid">
@@ -27,12 +23,10 @@
                 <ul class="nav navbar-nav navbar-right">
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
-                            <!--<div id="showId"><shiro:principal/> <span class="caret"></span></div>-->
+                            <div id="showUser"><span class="caret"></span></div>
                         </a>
                         <ul class="dropdown-menu">
-                            <li>
-                                <a href="/logout">注销</a>
-                            </li>
+                            <li><a href="/logout">注销</a></li>
                         </ul>
                     </li>
                 </ul>
@@ -45,8 +39,8 @@
         <div class="col-md-2">
             <ul class="nav nav-pills nav-stacked" id="nav">
                 <li class="active"><a href="/admin/express">订单管理<span class="glyphicon glyphicon-tasks pull-right"/></a></li>
-                <li><a href="/admin/showCourier">人员管理<span class="glyphicon glyphicon-user pull-right"/></a></li>
-                <li><a href="/admin/showExpressRecycle">订单回收<span class="glyphicon glyphicon-trash pull-right"/></a></li>
+                <li><a href="/admin/staff">人员管理<span class="glyphicon glyphicon-user pull-right"/></a></li>
+                <li><a href="/admin/expressRecycle">订单回收<span class="glyphicon glyphicon-trash pull-right"/></a></li>
                 <li><a href="/admin/showFeedback">用户反馈<span class="glyphicon glyphicon-envelope pull-right"/></a></li>
                 <li><a href="/admin/passwordRest">重置密码<sapn class="glyphicon glyphicon-pencil pull-right" /></a></li>
                 <li><a href="/logout">退出系统<sapn class="glyphicon glyphicon-log-out pull-right" /></a></li>
@@ -74,9 +68,9 @@
                         </select>
                     </div>
                     <div class="form-group ml10">
-                        <label for="inputStartDate" class="ml10">从</label>
+                        <label for="inputStartDate" class="ml10">起</label>
                         <input type="date" id="inputStartDate" class="form-control ml10">
-                        <label for="inputEndDate" class="ml10">到</label>
+                        <label for="inputEndDate" class="ml10">讫</label>
                         <input type="date" id="inputEndDate" class="form-control ml10">
                     </div>
                     <div class="form-group">
@@ -97,16 +91,16 @@
             <div class="panel-body">
                 <div id="toolbar" class="btn-group">
                     <button id="btn_assign" type="button" class="btn btn-default">
-                        <span class="glyphicon glyphicon-check" aria-hidden="true"></span>分配
+                        <span class="glyphicon glyphicon-check" aria-hidden="true"></span> 分配
                     </button>
                     <button id="btn_confirm" type="button" class="btn btn-default">
-                        <span class="glyphicon glyphicon-saved" aria-hidden="true"></span>确认
+                        <span class="glyphicon glyphicon-saved" aria-hidden="true"></span> 确认
                     </button>
                     <button id="btn_error" type="button" class="btn btn-default">
-                        <span class="glyphicon glyphicon-alert" aria-hidden="true"></span>异常
+                        <span class="glyphicon glyphicon-alert" aria-hidden="true"></span> 异常
                     </button>
                     <button id="btn_delete" type="button" class="btn btn-default">
-                        <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>删除
+                        <span class="glyphicon glyphicon-remove" aria-hidden="true"></span> 删除
                     </button>
                 </div>
                 <table id="tb_express"></table>
@@ -269,8 +263,17 @@
         var oButtonInit = new ButtonInit();
         oButtonInit.Init();
 
+        // 获取登录名
+        sendJson("get", "/username", {}, true, function (res) {
+            if (res.status) {
+                $("#showUser").text(res.data);
+            }
+        }, function () {
+            $.message({message: '未知错误', type: 'error'});
+        });
+
         // 初始化订单状态下拉框
-        sendJson("get", "/express/status/list", {}, true, function (res) {
+        sendJson("get", "/admin/express/status", {}, true, function (res) {
             if (res.status) {
                 var html = '<option value="-1">所有状态</option>';
                 for(var i=0;i<res.data.length;i++) {
@@ -352,6 +355,7 @@
                 rows: params.limit,                         //页面大小
                 page: (params.offset / params.limit) + 1,   //页码
                 // 筛选参数
+                hasDelete: false,
                 status: $("#inputStatus").val(),
                 includeDay: $("#inputIncludeDay").val(),
                 startDate: $("#inputStartDate").val(),
@@ -390,7 +394,7 @@
                         }
                         // 显示派送人员模态框
                         var html = "";
-                        sendJson("get", "/admin/staff/", {}, false, function (res) {
+                        sendJson("get", "/admin/staff/listName", {}, false, function (res) {
                             if(res.status) {
                                 for(var i=0;i<res.data.length;i++) {
                                     html += '<option value="'+res.data[i].id+'">'+res.data[i].username+'</option>';
@@ -500,27 +504,25 @@
                     for (var i = 0; i < row.length; i++) {
                         ids.push(row[i].id);
                     }
-                    var msg = "即将删除订单：" + ids + "，确认执行？";
-                    if (!confirm(msg)) {
-                        return false;
+                    var msg = "即将删除订单：" + ids + "，删除后将被移入回收站，确认执行？";
+                    if (confirm(msg)) {
+                        sendArray("post", "/admin/express/delete", {"ids": ids}, false, function (res) {
+                            // 当操作成功时，刷新表格
+                            if (res.status) {
+                                flushTable();
+                            }
+                        }, function () {
+                            $.message({message: '未知错误', type: 'error'});
+                        });
                     }
-                    sendArray("post", "/admin/express/delete", {"ids": ids}, false, function (res) {
-                        // 当操作成功时，刷新表格
-                        if (res.status) {
-                            flushTable();
-                        }
-                    }, function () {
-                        $.message({message: '未知错误', type: 'error'});
-                    });
                 }
             });
         };
         return oInit;
     };
-    
     //操作栏的格式化
     function actionFormatter(value, row, index) {
-        var id = value;
+        var id = "'" + value + "'";
         var result = '<button class="btn btn-xs btn-info" onclick="showExpress('+id+')" title="查看"><span class="glyphicon glyphicon-search"></span></button>\n' +
             '         <button class="btn btn-xs btn-danger" onclick="deleteExpress('+id+')" title="删除"><span class="glyphicon glyphicon-remove"></span></button>';
         return result;
@@ -542,7 +544,7 @@
                 $("#inputInfoAddress").text(data.address);
                 $("#inputInfoRemark").text(data.remark);
                 $("#inputInfoPayment").text(data.paymentType);
-                $("#inputInfoStatus").text(data.statusName);
+                $("#inputInfoStatus").html(data.statusName);
                 $("#inputInfoStaff").text(data.staffName);
                 $("#inputInfoStaffRemark").text(data.staffRemark);
                 $("#inputInfoDate").text(data.createDate);
@@ -558,14 +560,17 @@
 
     // 删除订单
     function deleteExpress(id) {
-        sendArray("post", "/admin/express/delete", {"ids": id}, false, function (res) {
-            // 当操作成功时，刷新表格
-            if (res.status) {
-                flushTable();
-            }
-        }, function () {
-            $.message({message: '未知错误', type: 'error'});
-        });
+        var msg = "即将删除订单：" + id + "，删除后将被移入回收站，确认执行？";
+        if (confirm(msg)) {
+            sendArray("post", "/admin/express/delete", {"ids": id}, false, function (res) {
+                // 当操作成功时，刷新表格
+                if (res.status) {
+                    flushTable();
+                }
+            }, function () {
+                $.message({message: '未知错误', type: 'error'});
+            });
+        }
     }
 </script>
 </body>

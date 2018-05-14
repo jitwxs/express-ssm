@@ -1,4 +1,5 @@
 /*
+    desp：HTTP相关
     author:jitwxs
     time:2018-03-15
  */
@@ -44,7 +45,6 @@ function sendArray(_type, _url, _data, _async, _successCallback, _errorCallback)
         }
     });
 }
-
 
 /*
     功能：上传文件的AJAX

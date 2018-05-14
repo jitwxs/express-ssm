@@ -4,7 +4,7 @@ import jit.wxs.express.pojo.Express;
 
 /**
  * @author jitwxs
- * @date 2018/5/2 10:30
+ * @since 2018/5/2 10:30
  */
 public class ExpressDto extends Express {
     /**
@@ -18,9 +18,23 @@ public class ExpressDto extends Express {
     private String staffName;
 
     /**
+     * 订单配送员联系电话
+     */
+    private String staffTel;
+
+    /**
      * 订单支付方式
      */
     private String paymentType;
+
+    /**
+     * 线上支付金额
+     */
+    private Double onlinePayment;
+    /**
+     * 线下支付金额
+     */
+    private Double offlinePayment;
 
     public String getStatusName() {
         return statusName;
@@ -34,6 +48,14 @@ public class ExpressDto extends Express {
         return staffName;
     }
 
+    public String getStaffTel() {
+        return staffTel;
+    }
+
+    public void setStaffTel(String staffTel) {
+        this.staffTel = staffTel;
+    }
+
     public void setStaffName(String staffName) {
         this.staffName = staffName;
     }
@@ -44,5 +66,21 @@ public class ExpressDto extends Express {
 
     public void setPaymentType(String paymentType) {
         this.paymentType = paymentType;
+    }
+
+    public Double getOnlinePayment() {
+        return onlinePayment;
+    }
+
+    public void setOnlinePayment(Double onlinePayment) {
+        this.onlinePayment = onlinePayment;
+    }
+
+    public Double getOfflinePayment() {
+        return offlinePayment;
+    }
+
+    public void setOfflinePayment(Double offlinePayment) {
+        this.offlinePayment = offlinePayment;
     }
 }

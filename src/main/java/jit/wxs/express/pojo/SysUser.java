@@ -20,7 +20,7 @@ public class SysUser implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @TableId(type = IdType.ID_WORKER_STR)
+    @TableId(type = IdType.UUID)
     private String id;
     /**
      * 登录名
@@ -29,11 +29,18 @@ public class SysUser implements Serializable {
     private String password;
     private String tel;
     private String sex;
+    private String address;
+    @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
     private Date birthday;
     /**
      * 权限id;0：admin；1：staff
      */
     private Integer roleId;
+
+    /**
+     * 状态；0：在职；1：冻结；2：离职
+     */
+    private Integer status;
 
     @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
     private Date createDate;
@@ -83,6 +90,14 @@ public class SysUser implements Serializable {
         this.sex = sex;
     }
 
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
     public Date getBirthday() {
         return birthday;
     }
@@ -97,6 +112,14 @@ public class SysUser implements Serializable {
 
     public void setRoleId(Integer roleId) {
         this.roleId = roleId;
+    }
+
+    public Integer getStatus() {
+        return status;
+    }
+
+    public void setStatus(Integer status) {
+        this.status = status;
     }
 
     public Date getCreateDate() {

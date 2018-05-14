@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>人员管理 - 快递代拿系统</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+
+    <link rel="stylesheet" href="../../../css/bootstrap.css"/>
+    <link rel="stylesheet" href="../../../css/bootstrap-table.css"/>
+    <link rel="stylesheet" href="../../../css/message.css"/>
+    <link rel="stylesheet" href="../../../css/express.css">
+</head>
+<body>
+<div class="container-fluid">
+    <!-- 顶栏 -->
+    <nav class="navbar navbar-default">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <a class="navbar-brand">快递代拿管理系统</a>
+            </div>
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav navbar-right">
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                            <div id="showUser"><span class="caret"></span></div>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a href="/logout">注销</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <!-- 主体 -->
+    <div class="row">
+        <!-- 左侧菜单 -->
+        <div class="col-md-2">
+            <ul class="nav nav-pills nav-stacked" id="nav">
+                <li><a href="/admin/express">订单管理<span class="glyphicon glyphicon-tasks pull-right"/></a></li>
+                <li class="active"><a href="/admin/staff">人员管理<span class="glyphicon glyphicon-user pull-right"/></a></li>
+                <li><a href="/admin/expressRecycle">订单回收<span class="glyphicon glyphicon-trash pull-right"/></a></li>
+                <li><a href="/admin/showFeedback">用户反馈<span class="glyphicon glyphicon-envelope pull-right"/></a></li>
+                <li><a href="/admin/passwordRest">重置密码<sapn class="glyphicon glyphicon-pencil pull-right" /></a></li>
+                <li><a href="/logout">退出系统<sapn class="glyphicon glyphicon-log-out pull-right" /></a></li>
+            </ul>
+        </div>
+        <!-- 右侧数据 -->
+        <div class="panel col-md-10">
+            <!-- 筛选条件 -->
+            <div class="panel-heading">
+                <form class="form-inline">
+                    <div class="form-group ml10">
+                        <label for="inputStatus">状态</label>
+                        <select id="inputStatus" class="form-control">
+                            <option value="-1">所有状态</option>
+                        </select>
+                    </div>
+                    <div class="form-group ml10">
+                        <label for="inputSex">性别</label>
+                        <select id="inputSex" class="form-control">
+                            <option value="">所有</option>
+                            <option value="male">男</option>
+                            <option value="female">女</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="inputName">姓名</label>
+                        <input type="text" class="form-control" id="inputName">
+                    </div>
+                    <div class="form-group">
+                        <label for="inputTel" class="ml10">手机号码</label>
+                        <input type="text" class="form-control" id="inputTel" onkeyup="this.value=this.value.replace(/\D/g,'')" onafterpaste="this.value=this.value.replace(/\D/g,'')">
+                    </div>
+                    <div class="form-group">
+                        <label for="inputAddress" class="ml10">居住地址</label>
+                        <input type="text" class="form-control" id="inputAddress">
+                    </div>
+                    <button type="button" class="btn btn-info ml10" onclick="flushTable()">条件查询</button>
+                </form>
+            </div>
+            <div class="panel-body">
+                <div id="toolbar" class="btn-group">
+                    <button id="btn_active" type="button" class="btn btn-default">
+                        <span class="glyphicon glyphicon-check" aria-hidden="true"></span> 在职
+                    </button>
+                    <button id="btn_freeze" type="button" class="btn btn-default">
+                        <span class="glyphicon glyphicon-asterisk" aria-hidden="true"></span> 冻结
+                    </button>
+                    <button id="btn_leave" type="button" class="btn btn-default">
+                        <span class="glyphicon glyphicon-log-out" aria-hidden="true"></span> 离职
+                    </button>
+                </div>
+                <table id="tb_user"></table>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script src="../../../js/jquery3.3.1.min.js"></script>
+<script src="../../../js/bootstrap.min.js"></script>
+<script src="../../../js/bootstrap-table.min.js"></script>
+<script src="../../../js/bootstrap-table-zh-CN.min.js"></script>
+<script src="../../../js/message.js"></script>
+<script src="../../../js/http.js"></script>
+<script type="text/javascript">
+    $(function () {
+        //1、初始化Table
+        var oTable = new TableInit();
+        oTable.Init();
+
+        //2、初始化Button的点击事件
+        var oButtonInit = new ButtonInit();
+        oButtonInit.Init();
+
+        // 获取登录名
+        sendJson("get", "/username", {}, true, function (res) {
+            if (res.status) {
+                $("#showUser").text(res.data);
+            }
+        }, function () {
+            $.message({message: '未知错误', type: 'error'});
+        });
+
+        // 初始化用户状态下拉框
+        sendJson("get", "/admin/staff/status", {}, true, function (res) {
+            if (res.status) {
+                var html = '<option value="-1">所有状态</option>';
+                for(var i=0;i<res.data.length;i++) {
+                    html += '<option value="'+res.data[i].id+'">'+res.data[i].name+'</option>';
+                }
+                document.getElementById("inputStatus").innerHTML = html;
+            }
+        }, function () {
+            $.message({message: '未知错误', type: 'error'});
+        });
+    });
+
+    var TableInit = function () {
+        var oTableInit = new Object();
+        //初始化Table
+        oTableInit.Init = function () {
+            $('#tb_user').bootstrapTable({
+                url: '/admin/staff/list',           //请求后台的URL（*）
+                method: 'get',                      //请求方式（*）
+                toolbar: '#toolbar',                //工具按钮组id
+                striped: true,                      //是否显示行间隔色
+                cache: false,                       //是否使用缓存，默认为true，所以一般情况下需要设置一下这个属性（*）
+                pagination: true,                   //是否显示分页（*）
+                sortable: false,                    //是否启用排序
+                sortOrder: "asc",                   //排序方式
+                queryParams: oTableInit.queryParams,//传递参数（*）
+                sidePagination: "server",           //分页方式：client客户端分页，server服务端分页（*）
+                pageNumber:1,                       //初始化加载第一页，默认第一页
+                pageSize: 10,                       //每页的记录行数（*）
+                pageList: [10, 25, 50, 100],        //可供选择的每页的行数（*）
+                search: false,                       //是否显示表格搜索，此搜索是客户端搜索，不会进服务端。后台分页时意义不大
+                showColumns: true,                  //是否显示所有的列
+                showRefresh: true,                  //是否显示刷新按钮
+                minimumCountColumns: 2,             //最少允许的列数
+                clickToSelect: true,                //是否启用点击选中行
+                // height: 750,                        //行高，如果没有设置height属性，表格自动根据记录条数觉得表格高度
+                uniqueId: "id",                     //每一行的唯一标识，一般为主键列
+                showToggle:false,                   //是否显示详细视图和列表视图的切换按钮
+                cardView: false,                    //是否显示详细视图
+                detailView: false,                  //是否显示父子表
+                columns: [{
+                    checkbox: true
+                }, {
+                    field: 'username',
+                    title: '姓名'
+                }, {
+                    field: 'sex',
+                    title: '性别',
+                    formatter: sexFormatter
+                }, {
+                    field: 'tel',
+                    title: '手机号码'
+                }, {
+                    field: 'address',
+                    title: '居住地址',
+                    width: 200
+                }, {
+                    field: 'birthday',
+                    title: '生日'
+                }, {
+                    field: 'statusName',
+                    title: '状态'
+                }]
+            });
+        };
+
+        // 传递给后台的参数
+        oTableInit.queryParams = function (params) {
+            return {   //这里的键的名字和后台参数必须一致
+                rows: params.limit,                         //页面大小
+                page: (params.offset / params.limit) + 1,   //页码
+                // 筛选参数
+                status: $("#inputStatus").val(),
+                sex: $("#inputSex").val(),
+                tel: $("#inputTel").val(),
+                name: $("#inputName").val(),
+                address: $("#inputAddress").val()
+            };
+        };
+        return oTableInit;
+    };
+
+    var ButtonInit = function () {
+        var oInit = new Object();
+
+        oInit.Init = function () {
+            // 在职
+            $("#btn_active").click(function () {
+                var row = $('#tb_user').bootstrapTable("getSelections");
+                if(row.length > 0) {
+                    var ids = new Array();
+                    for(var i=0;i<row.length;i++) {
+                        ids.push(row[i].id);
+                    }
+                    var msg = "确认要将选中用户状态修改为在职吗？";
+                    if(!confirm(msg)) {
+                        return false;
+                    }
+                    sendArray("post", "/admin/staff/active", {"ids": ids}, false, function (res) {
+                        // 当操作成功时，刷新表格
+                        if(res.status) {
+                            flushTable();
+                        } else {
+                            $.message({message: '操作失败', type: 'error'});
+                        }
+                    }, function () {
+                        $.message({message: '未知错误', type: 'error'});
+                    });
+                }
+            });
+            // 冻结
+            $("#btn_freeze").click(function () {
+                var row = $('#tb_user').bootstrapTable("getSelections");
+                if(row.length > 0) {
+                    var ids = new Array();
+                    for(var i=0;i<row.length;i++) {
+                        ids.push(row[i].id);
+                    }
+                    var msg = "确认要将选中用户状态修改为冻结吗？";
+                    if(!confirm(msg)) {
+                        return false;
+                    }
+                    sendArray("post", "/admin/staff/freeze", {"ids": ids}, false, function (res) {
+                        // 当操作成功时，刷新表格
+                        if(res.status) {
+                            flushTable();
+                        } else {
+                            $.message({message: '操作失败', type: 'error'});
+                        }
+                    }, function () {
+                        $.message({message: '未知错误', type: 'error'});
+                    });
+                }
+            });
+            // 离职
+            $("#btn_leave").click(function () {
+                var row = $('#tb_user').bootstrapTable("getSelections");
+                if(row.length > 0) {
+                    var ids = new Array();
+                    for(var i=0;i<row.length;i++) {
+                        ids.push(row[i].id);
+                    }
+                    var msg = "确认要将选中用户状态修改为离职吗？";
+                    if(!confirm(msg)) {
+                        return false;
+                    }
+                    sendArray("post", "/admin/staff/leave", {"ids": ids}, false, function (res) {
+                        // 当操作成功时，刷新表格
+                        if(res.status) {
+                            flushTable();
+                        } else {
+                            $.message({message: '操作失败', type: 'error'});
+                        }
+                    }, function () {
+                        $.message({message: '未知错误', type: 'error'});
+                    });
+                }
+            });
+        };
+        return oInit;
+    };
+
+    function sexFormatter(value, row, index) {
+        if(value === "male")
+            return "男";
+        else if(value === "female")
+            return "女";
+    }
+
+    function flushTable() {
+        $("#tb_user").bootstrapTable('refresh',{url : '/admin/staff/list'} );
+    }
+</script>
+</body>
+</html>

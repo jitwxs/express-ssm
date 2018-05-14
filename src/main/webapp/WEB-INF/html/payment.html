@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <title>订单支付 - 快递代拿系统</title>
+    <link rel="stylesheet" href="../../css/bootstrap.css"/>
+    <link rel="stylesheet" href="../../css/message.css"/>
+    <link rel="stylesheet" href="../../css/express.css"/>
+</head>
+<body>
+<div class="container">
+    <!-- 导航栏 -->
+    <nav class="navbar navbar-default">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+                        data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand">快递代拿信息填写</a>
+            </div>
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav navbar-right">
+                    <li><a href="/search">查询中心</a></li>
+                    <li><a href="/feedback">意见反馈</a></li>
+                    <li><a href="/login">登陆系统</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <!-- 主体部分 -->
+    <div class="panel">
+        <div class="panel-heading">
+            <h3>您的订单信息已生成，请核验无误后支付订单</h3>
+        </div>
+        <div class="panel-body">
+            <div>
+                <div class="col-sm-6">
+                    <h4>订单信息</h4>
+                    <form class="form-horizontal">
+                        <div class="form-group">
+                            <label for="expressName" class="col-sm-2 control-label">姓名</label>
+                            <div class="col-sm-10">
+                                <p class="form-control-static" id="expressName"></p>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="expressTel" class="col-sm-2 control-label">联系电话</label>
+                            <div class="col-sm-10">
+                                <p class="form-control-static" id="expressTel"></p>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="expressAddress" class="col-sm-2 control-label">配送地址</label>
+                            <div class="col-sm-10">
+                                <p class="form-control-static" id="expressAddress"></p>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="expressMessage" class="col-sm-2 control-label">取件短信</label>
+                            <div class="col-sm-10">
+                                <p class="form-control-static" id="expressMessage"></p>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="expressRemark" class="col-sm-2 control-label">备注</label>
+                            <div class="col-sm-10">
+                                <p class="form-control-static" id="expressRemark"></p>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div  class="col-sm-6">
+                    <h4>价格计算</h4>
+                    <blockquote class="pt10">
+                        <p>< 500g/件：2元；< 1kg/件：3元；> 1kg/kg：4元</p>
+                    </blockquote>
+                    <h4>预估价格： <span class="red-span" lang="totalPrice">0.00</span> 元</h4>
+                    <form class="form-horizontal" id="packageForm">
+                    </form>
+                    <div class="col-sm-offset-2 col-sm-10">
+                        <button type="button" class="btn btn-default" onclick="addPackage()">添加包裹</button>
+                        <button type="button" class="btn btn-default" onclick="deletePackage()">删除包裹</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-12 pt10">
+                <h4>支付方式</h4>
+                <form class="form-horizontal">
+                    <!-- Nav tabs -->
+                    <ul class="nav nav-tabs" role="tablist">
+                        <li role="presentation" class="active"><a href="#alipay_tab" aria-controls="alipay" role="tab" data-toggle="tab">支付宝支付</a></li>
+                        <li role="presentation"><a href="#wechat_tab" aria-controls="weixin" role="tab" data-toggle="tab">微信支付</a></li>
+                        <li role="presentation"><a href="#onlineOff_tab" aria-controls="onlineOff" role="tab" data-toggle="tab">线下支付</a></li>
+                    </ul>
+                    <!-- Tab panes -->
+                    <div class="tab-content">
+                        <div role="tabpanel" class="tab-pane fade in active" id="alipay_tab">
+                            <div class="panel panel-info">
+                                <div class="panel-body">
+                                    <div>
+                                        <img src="../../images/alipay.png" alt="支付宝付款码" class="img-rounded pay-qrcode col-sm-6">
+                                        <label class="col-sm-6 col-sm-offset-6">扫描左侧二维码并支付<span class="red-span" lang="totalPrice">0.00</span> 元</label>
+                                    </div>
+                                    <input class="form-control" id="ali_num" type="text" placeholder="请复制支付宝支付订单号">
+                                </div>
+                                <div class="panel-footer">
+                                    <button type="button" class="btn btn-info" onclick="alipay()">完成支付</button>
+                                    <button type="button" class="btn btn-warning" onclick="closeExpress()" style="float: right">放弃订单</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div role="tabpanel" class="tab-pane fade" id="wechat_tab">
+                            <div class="panel panel-info">
+                                <div class="panel-body">
+                                    <div>
+                                        <img src="../../images/weixin.jpg" alt="微信付款码" class="img-rounded pay-qrcode col-sm-6">
+                                        <label class="col-sm-6 col-sm-offset-6">扫描左侧二维码并支付<span class="red-span" lang="totalPrice">0.00</span> 元</label>
+                                    </div>
+                                    <input class="form-control" id="wechat_num" type="text" placeholder="请复制微信支付订单号">
+                                </div>
+                                <div class="panel-footer">
+                                    <button type="button" class="btn btn-info" onclick="wechatpay()">完成支付</button>
+                                    <button type="button" class="btn btn-warning" onclick="closeExpress()" style="float: right">放弃订单</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div role="tabpanel" class="tab-pane fade" id="onlineOff_tab">
+                            <div class="panel panel-info">
+                                <div class="panel-body">
+                                    <label>为了您能快速取件，推荐您使用线上支付，线下支付请在取件时付款</label><br>
+                                    <label>请提前准备现金 <span class="red-span" lang="totalPrice">0.00</span> 元</label>
+                                </div>
+                                <div class="panel-footer">
+                                    <button type="button" class="btn btn-info" onclick="onlineOffpay()">完成支付</button>
+                                    <button type="button" class="btn btn-warning" onclick="closeExpress()" style="float: right">放弃订单</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="../../js/jquery3.3.1.min.js"></script>
+<script src="../../js/bootstrap.min.js"></script>
+<script src="../../js/message.js"></script>
+<script src="../../js/http.js"></script>
+<script>
+    var express,total=0;
+    $(function () {
+        sendJson("get", "/payment/express", {}, false, function (res) {
+            if (!res.status) {
+                $.message({message: res.info, type: 'error'});
+            } else {
+                express = res.data;
+                $("#expressName").text(express.name);
+                $("#expressTel").text(express.tel);
+                $("#expressAddress").text(express.address);
+                $("#expressMessage").text(express.message);
+                $("#expressRemark").text(express.remark);
+            }
+        }, function () {
+            $.message({message: '未知错误', type: 'error'});
+        });
+    });
+
+    // 更新价格
+    function updatePrice() {
+        total = 0;
+        $("input[name='price']").each(function(){
+            var weight = $(this).val();
+            if(weight !== "") {
+                if(!isNaN(weight)) {
+                    weight = parseFloat(weight);
+                    var tmp = 0;
+                    // 如果小于500g，2元
+                    if(weight < 0.5)
+                        tmp = 2;
+                    else if(weight < 1)
+                        tmp = 3;
+                    else if(weight >= 1)
+                        // 向上取整
+                        tmp = 4 * Math.ceil(weight);
+                    total += tmp;
+                } else {
+                    // 如果不是数字，将input值修改为空
+                    $(this).val("");
+                }
+            }
+        });
+        // 两位小数，四舍五入
+        total = total.toFixed(2);
+        $("span[lang='totalPrice']").each(function() {
+            $(this).text(total);
+        });
+    }
+    
+    function addPackage() {
+        var html = '<div class="form-group">\n' +
+            '                            <label class="col-sm-3 control-label">预估重量（单位：KG）</label>\n' +
+            '                            <div class="col-sm-9">\n' +
+            '                                <input type="number" class="form-control" name="price" onchange="updatePrice()" onkeyup="updatePrice()">\n' +
+            '                            </div>\n' +
+            '                        </div>';
+        $("#packageForm").append(html);
+    }
+    
+    function deletePackage() {
+        $("#packageForm").children().last().remove();
+        updatePrice();
+    }
+
+    // 关闭订单
+    function closeExpress() {
+        sendJson("get", "/payment/close", {}, false, function (res) {
+            if (!res.status) {
+                $.message({message: res.info, type: 'error'});
+            } else {
+                window.location.href = res.data;
+            }
+        }, function () {
+            $.message({message: '未知错误', type: 'error'});
+        });
+    }
+
+    function payment(type,num) {
+        if(express == null) {
+            $.message({message: "订单已失效，请刷新页面。如无法解决，请重新下单", type: 'error'});
+            return false;
+        }
+
+        sendJson("post", "/payment", {"time":express.createDate,"type":type,"money":total,"num":num}, false, function (res) {
+            if (!res.status) {
+                $.message({message: res.info, type: 'error'});
+            } else {
+                window.location.href = res.data;
+            }
+        }, function () {
+            $.message({message: '未知错误', type: 'error'});
+        });
+    }
+    
+    function alipay() {
+        // type = 2
+        var num = $("#ali_num").val();
+        if(num === "") {
+            $.message({message: '订单号不能为空', type: 'warning'});
+            return false;
+        }
+        payment(2,num);
+    }
+    
+    function wechatpay() {
+        // type = 1
+        var num = $("#wechat_num").val();
+        if(num === "") {
+            $.message({message: '订单号不能为空', type: 'warning'});
+            return false;
+        }
+        payment(1,num);
+    }
+    
+    function onlineOffpay() {
+        // type = 0
+        payment(0,null);
+    }
+</script>
+</body>
+</html>

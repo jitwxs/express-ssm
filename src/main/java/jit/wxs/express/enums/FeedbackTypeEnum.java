@@ -1,43 +1,38 @@
 package jit.wxs.express.enums;
 
 /**
- * 快递状态枚举
+ * 反馈类型枚举
  * @author jitwxs
- * @date 2018/5/2 14:14
+ * @since 2018/5/14 14:00
  */
-public enum ExpressStatusEnum {
+public enum FeedbackTypeEnum {
     /**
-     * 等待派送
+     * 订单反馈
      */
-    WAIT_DIST("等待派送", 1),
+    EXPRESS("订单反馈", 1),
 
     /**
-     * 派送中
+     * 意见反馈
      */
-    TRANSPORT("派送中", 2),
+    SUGGEST("意见反馈", 2),
 
     /**
-     * 订单完成
+     * BUG反馈
      */
-    COMPLTE("订单完成", 3),
-
-    /**
-     * '订单异常
-     */
-    ERROR("订单异常", 4);
+    BUG("BUG反馈", 3);
 
     private String name;
     private int index;
 
-    ExpressStatusEnum(String name, int index) {
+    FeedbackTypeEnum(String name, int index) {
         this.name = name;
         this.index = index;
     }
 
     public static String getName(int index) {
-        for (ExpressStatusEnum expressStatusEnum : ExpressStatusEnum.values()) {
-            if (expressStatusEnum.getIndex() == index) {
-                return expressStatusEnum.name;
+        for (FeedbackTypeEnum feedbackTypeEnum : FeedbackTypeEnum.values()) {
+            if (feedbackTypeEnum.getIndex() == index) {
+                return feedbackTypeEnum.name;
             }
         }
         return null;

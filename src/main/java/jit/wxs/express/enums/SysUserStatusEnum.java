@@ -1,43 +1,38 @@
 package jit.wxs.express.enums;
 
 /**
- * 快递状态枚举
+ * 用户状态枚举
  * @author jitwxs
- * @date 2018/5/2 14:14
+ * @since 2018/5/13 20:03
  */
-public enum ExpressStatusEnum {
+public enum SysUserStatusEnum {
     /**
-     * 等待派送
+     * 在职
      */
-    WAIT_DIST("等待派送", 1),
+    ACTIVE("在职", 0),
 
     /**
-     * 派送中
+     * 冻结
      */
-    TRANSPORT("派送中", 2),
+    FREEZE("冻结", 1),
 
     /**
-     * 订单完成
+     * 离职
      */
-    COMPLTE("订单完成", 3),
-
-    /**
-     * '订单异常
-     */
-    ERROR("订单异常", 4);
+    LEAVE("离职", 2);
 
     private String name;
     private int index;
 
-    ExpressStatusEnum(String name, int index) {
+    SysUserStatusEnum(String name, int index) {
         this.name = name;
         this.index = index;
     }
 
     public static String getName(int index) {
-        for (ExpressStatusEnum expressStatusEnum : ExpressStatusEnum.values()) {
-            if (expressStatusEnum.getIndex() == index) {
-                return expressStatusEnum.name;
+        for (SysUserStatusEnum userStatusEnum : SysUserStatusEnum.values()) {
+            if (userStatusEnum.getIndex() == index) {
+                return userStatusEnum.name;
             }
         }
         return null;

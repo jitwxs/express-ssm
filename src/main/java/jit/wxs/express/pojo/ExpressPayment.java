@@ -23,14 +23,14 @@ public class ExpressPayment implements Serializable {
     /**
      * 订单号
      */
-    @TableId(type = IdType.ID_WORKER)
+    @TableId(type = IdType.INPUT)
     private String expressId;
     /**
      * 支付方式
      */
     private Integer type;
     /**
-     * 线上付款金额
+     * 线上支付金额
      */
     private Double onlinePayment;
     /**
@@ -51,7 +51,6 @@ public class ExpressPayment implements Serializable {
     @TableField(update = "now()")
     @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
     private Date updateDate;
-
 
     public String getExpressId() {
         return expressId;
@@ -115,19 +114,5 @@ public class ExpressPayment implements Serializable {
 
     public void setUpdateDate(Date updateDate) {
         this.updateDate = updateDate;
-    }
-
-    @Override
-    public String toString() {
-        return "ExpressPayment{" +
-        ", expressId=" + expressId +
-        ", type=" + type +
-        ", onlinePayment=" + onlinePayment +
-        ", onlinePaymentNum=" + onlinePaymentNum +
-        ", offlinePayment=" + offlinePayment +
-        ", remark=" + remark +
-        ", createDate=" + createDate +
-        ", updateDate=" + updateDate +
-        "}";
     }
 }
