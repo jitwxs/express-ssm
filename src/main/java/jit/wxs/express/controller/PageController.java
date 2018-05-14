@@ -54,4 +54,14 @@ public class PageController {
     public String showStaff() {
         return "admin/staff";
     }
+
+    @GetMapping("/admin/feedback")
+    public String showFeedback() {
+        return "admin/feedback";
+    }
+
+    @GetMapping("/admin/password")
+    public String showPassword() {
+        return "admin/password";
+    }
 }

@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>用户反馈 - 快递代拿系统</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+
+    <link rel="stylesheet" href="../../../css/bootstrap.css"/>
+    <link rel="stylesheet" href="../../../css/bootstrap-table.css"/>
+    <link rel="stylesheet" href="../../../css/message.css"/>
+    <link rel="stylesheet" href="../../../css/express.css">
+</head>
+<body>
+<div class="container-fluid">
+    <!-- 顶栏 -->
+    <nav class="navbar navbar-default">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <a class="navbar-brand">快递代拿管理系统</a>
+            </div>
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav navbar-right">
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                            <div id="showUser"><span class="caret"></span></div>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a href="/logout">注销</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <!-- 主体 -->
+    <div class="row">
+        <!-- 左侧菜单 -->
+        <div class="col-md-2">
+            <ul class="nav nav-pills nav-stacked" id="nav">
+                <li><a href="/admin/express">订单管理<span class="glyphicon glyphicon-tasks pull-right"/></a></li>
+                <li><a href="/admin/staff">人员管理<span class="glyphicon glyphicon-user pull-right"/></a></li>
+                <li><a href="/admin/expressRecycle">订单回收<span class="glyphicon glyphicon-trash pull-right"/></a></li>
+                <li class="active"><a href="/admin/feedback">用户反馈<span class="glyphicon glyphicon-envelope pull-right"/></a></li>
+                <li><a href="/admin/password">重置密码<sapn class="glyphicon glyphicon-pencil pull-right" /></a></li>
+                <li><a href="/logout">退出系统<sapn class="glyphicon glyphicon-log-out pull-right" /></a></li>
+            </ul>
+        </div>
+        <!-- 右侧数据 -->
+        <div class="panel col-md-10">
+            <!-- 筛选条件 -->
+            <div class="panel-heading">
+                <form class="form-inline">
+                    <div class="form-group ml10">
+                        <label for="inputType">反馈类型</label>
+                        <select id="inputType" class="form-control">
+                            <option value="-1">所有类型</option>
+                        </select>
+                    </div>
+                    <div class="form-group ml10">
+                        <label for="inputStatus">反馈状态</label>
+                        <select id="inputStatus" class="form-control">
+                            <option value="-1">所有状态</option>
+                            <option value="0">未处理</option>
+                            <option value="1">已处理</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="inputName">姓名</label>
+                        <input type="text" class="form-control" id="inputName">
+                    </div>
+                    <div class="form-group">
+                        <label for="inputTel" class="ml10">联系电话</label>
+                        <input type="text" class="form-control" id="inputTel" onkeyup="this.value=this.value.replace(/\D/g,'')" onafterpaste="this.value=this.value.replace(/\D/g,'')">
+                    </div>
+                    <button type="button" class="btn btn-info ml10" onclick="flushTable()">条件查询</button>
+                </form>
+            </div>
+            <div class="panel-body">
+                <div id="toolbar" class="btn-group">
+                    <button id="btn_delete" type="button" class="btn btn-default">
+                        <span class="glyphicon glyphicon-remove" aria-hidden="true"></span> 删除
+                    </button>
+                </div>
+                <table id="tb_feedback"></table>
+            </div>
+        </div>
+        <!-- 处理反馈模态框 -->
+        <div class="modal fade" id="feedbackModel" tabindex="-1" role="dialog" aria-labelledby="feedbackModelLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="feedbackModelLabel">反馈处理</h4>
+                    </div>
+                    <div class="modal-body">
+                        <form class="form-horizontal">
+                            <div class="form-group">
+                                <label for="inputContent" class="col-sm-2 control-label">处理内容</label>
+                                <div class="col-sm-10">
+                                    <textarea class="form-control dis_change_textarea" id="inputContent" rows="5"
+                                              placeholder="请输入反馈内容"></textarea>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" id="feedbackBtn">处理</button>
+                        <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="../../../js/jquery3.3.1.min.js"></script>
+<script src="../../../js/bootstrap.min.js"></script>
+<script src="../../../js/bootstrap-table.min.js"></script>
+<script src="../../../js/bootstrap-table-zh-CN.min.js"></script>
+<script src="../../../js/message.js"></script>
+<script src="../../../js/http.js"></script>
+<script type="text/javascript">
+    $(function () {
+        //1、初始化Table
+        var oTable = new TableInit();
+        oTable.Init();
+
+        //2、初始化Button的点击事件
+        var oButtonInit = new ButtonInit();
+        oButtonInit.Init();
+
+        // 获取登录名
+        sendJson("get", "/username", {}, true, function (res) {
+            if (res.status) {
+                $("#showUser").text(res.data);
+            }
+        }, function () {
+            $.message({message: '未知错误', type: 'error'});
+        });
+
+        // 初始化反馈类型下拉框
+        sendJson("get", "/admin/feedback/type/list", {}, true, function (res) {
+            if (res.status) {
+                var html = '<option value="-1">所有类型</option>';
+                for(var i=0;i<res.data.length;i++) {
+                    html += '<option value="'+res.data[i].id+'">'+res.data[i].name+'</option>';
+                }
+                document.getElementById("inputType").innerHTML = html;
+            }
+        }, function () {
+            $.message({message: '未知错误', type: 'error'});
+        });
+    });
+
+    var TableInit = function () {
+        var oTableInit = new Object();
+        //初始化Table
+        oTableInit.Init = function () {
+            $('#tb_feedback').bootstrapTable({
+                url: '/admin/feedback/list',        //请求后台的URL（*）
+                method: 'get',                      //请求方式（*）
+                toolbar: '#toolbar',                //工具按钮组id
+                striped: true,                      //是否显示行间隔色
+                cache: false,                       //是否使用缓存，默认为true，所以一般情况下需要设置一下这个属性（*）
+                pagination: true,                   //是否显示分页（*）
+                sortable: false,                    //是否启用排序
+                sortOrder: "asc",                   //排序方式
+                queryParams: oTableInit.queryParams,//传递参数（*）
+                sidePagination: "server",           //分页方式：client客户端分页，server服务端分页（*）
+                pageNumber:1,                       //初始化加载第一页，默认第一页
+                pageSize: 10,                       //每页的记录行数（*）
+                pageList: [10, 25, 50, 100],        //可供选择的每页的行数（*）
+                search: false,                       //是否显示表格搜索，此搜索是客户端搜索，不会进服务端。后台分页时意义不大
+                showColumns: true,                  //是否显示所有的列
+                showRefresh: true,                  //是否显示刷新按钮
+                minimumCountColumns: 2,             //最少允许的列数
+                clickToSelect: true,                //是否启用点击选中行
+                // height: 750,                        //行高，如果没有设置height属性，表格自动根据记录条数觉得表格高度
+                uniqueId: "id",                     //每一行的唯一标识，一般为主键列
+                showToggle:false,                   //是否显示详细视图和列表视图的切换按钮
+                cardView: false,                    //是否显示详细视图
+                detailView: false,                  //是否显示父子表
+                columns: [{
+                    checkbox: true
+                }, {
+                    field: 'id',
+                    title: '反馈号'
+                }, {
+                    field: 'name',
+                    title: '姓名'
+                }, {
+                    field: 'tel',
+                    title: '联系电话'
+                }, {
+                    field: 'message',
+                    title: '内容',
+                    width: 200
+                }, {
+                    field: 'createDate',
+                    title: '反馈时间'
+                }, {
+                    field: 'typeName',
+                    title: '反馈类型'
+                }, {
+                    field: 'statusName',
+                    title: '反馈状态'
+                },  {
+                    field: 'staffName',
+                    title: '处理人'
+                }, {
+                    field: 'result',
+                    title: '处理结果'
+                }, {
+                    field: 'id',
+                    title: '操作',
+                    width: 120,
+                    align: 'center',
+                    valign: 'middle',
+                    formatter: actionFormatter
+                }]
+            });
+        };
+
+        // 传递给后台的参数
+        oTableInit.queryParams = function (params) {
+            return {   //这里的键的名字和后台参数必须一致
+                rows: params.limit,                         //页面大小
+                page: (params.offset / params.limit) + 1,   //页码
+                // 筛选参数
+                type: $("#inputType").val(),
+                status: $("#inputStatus").val(),
+                tel: $("#inputTel").val(),
+                name: $("#inputName").val()
+            };
+        };
+        return oTableInit;
+    };
+
+    var ButtonInit = function () {
+        var oInit = new Object();
+        oInit.Init = function () {
+            // 删除反馈
+            $("#btn_delete").click(function () {
+                var row = $('#tb_feedback').bootstrapTable("getSelections");
+                if (row.length > 0) {
+                    var ids = new Array();
+                    for (var i = 0; i < row.length; i++) {
+                        ids.push(row[i].id);
+                    }
+                    var msg = "即将删除反馈：" + ids + "，删除后反馈将无法恢复，确认执行？";
+                    if (confirm(msg)) {
+                        sendArray("post", "/admin/feedback/delete", {"ids": ids}, false, function (res) {
+                            // 当操作成功时，刷新表格
+                            if (res.status) {
+                                flushTable();
+                            }
+                        }, function () {
+                            $.message({message: '未知错误', type: 'error'});
+                        });
+                    }
+                }
+            });
+        };
+        return oInit;
+    };
+    //操作栏的格式化
+    function actionFormatter(value, row, index) {
+        var id = "'" + value + "'";
+        var result;
+        // 只有未处理的订单才需要显示处理按钮
+        if(row.status === 0) {
+            result = '<button class="btn btn-xs btn-info" onclick="handleFeedback('+id+')" title="处理"><span class="glyphicon glyphicon-pencil"></span></button>\n' +
+                '         <button class="btn btn-xs btn-danger" onclick="deleteFeedback('+id+')" title="删除"><span class="glyphicon glyphicon-remove"></span></button>';
+        } else {
+            result = '<button class="btn btn-xs btn-danger" onclick="deleteFeedback('+id+')" title="删除"><span class="glyphicon glyphicon-remove"></span></button>';
+        }
+        return result;
+    }
+
+    function flushTable() {
+        $("#tb_feedback").bootstrapTable('refresh',{url : '/admin/feedback/list'} );
+    }
+
+    function handleFeedback(id) {
+        $("#inputContent").val("");
+        $("#feedbackModel").modal("show");
+
+        $("#feedbackBtn").click(function () {
+            $("#feedbackModel").modal("hide");
+
+            var content = $("#inputContent").val();
+            sendJson("post", "/admin/feedback", {"id":id,"content":content}, false, function (res) {
+                if(res.status) {
+                    flushTable();
+                }
+            }, function () {
+                $.message({message: '未知错误', type: 'error'});
+            });
+        });
+    }
+
+    // 删除反馈
+    function deleteFeedback(id) {
+        var msg = "即将删除反馈：" + id + "，删除后将无法恢复，确认执行？";
+        if (confirm(msg)) {
+            sendArray("post", "/admin/feedback/delete", {"ids": id}, false, function (res) {
+                // 当操作成功时，刷新表格
+                if (res.status) {
+                    flushTable();
+                }
+            }, function () {
+                $.message({message: '未知错误', type: 'error'});
+            });
+        }
+    }
+</script>
+</body>
+</html>

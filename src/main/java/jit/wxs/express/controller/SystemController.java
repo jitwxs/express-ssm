@@ -5,7 +5,6 @@ import jit.wxs.express.pojo.Express;
 import jit.wxs.express.pojo.Feedback;
 import jit.wxs.express.pojo.SysUser;
 import jit.wxs.express.pojo.interactive.Msg;
-import jit.wxs.express.service.ExpressService;
 import jit.wxs.express.service.FeedbackService;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.UsernamePasswordToken;
@@ -29,8 +28,6 @@ import java.util.Date;
 public class SystemController {
     @Autowired
     private FeedbackService feedbackService;
-    @Autowired
-    private ExpressService expressService;
 
     @Value("${session.latest_express}")
     private String SESSION_LATEST_EXPRESS;
@@ -63,8 +60,12 @@ public class SystemController {
         UsernamePasswordToken token = new UsernamePasswordToken(user.getUsername(), user.getPassword());
         Subject subject = SecurityUtils.getSubject();
 
-        //如果获取不到用户名就是登录失败，但登录失败的话，会直接抛出异常
-        subject.login(token);
+        try {
+            //如果获取不到用户名就是登录失败，但登录失败的话，会直接抛出异常
+            subject.login(token);
+        } catch (Exception e) {
+            return Msg.error("用户名或密码错误");
+        }
 
         //所有用户均重定向对应的展示配送页面
         if (subject.hasRole(RoleEnum.ADMIN.getName())) {

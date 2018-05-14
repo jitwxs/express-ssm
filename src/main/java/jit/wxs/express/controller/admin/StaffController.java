@@ -12,10 +12,7 @@ import jit.wxs.express.service.SysUserService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
@@ -116,18 +113,11 @@ public class StaffController {
      */
     @GetMapping("/listName")
     public Msg listStaff() {
-//        List<Map<String,Object>> result = new ArrayList<>();
         // 获取所有在职的职员
         List<SysUser> staffs = userService.selectList(new EntityWrapper<SysUser>()
             .eq("status", SysUserStatusEnum.ACTIVE.getIndex())
             .eq("role_id", RoleEnum.STAFF.getIndex()));
 
-//        for(SysUser user :staffs) {
-//            Map<String,Object> map = new HashMap<>();
-//            map.put("id",user.getId());
-//            map.put("name",user.getUsername());
-//            result.add(map);
-//        }
         return Msg.ok(null,staffs);
     }
 
@@ -165,6 +155,26 @@ public class StaffController {
         map.put("rows", list);
 
         return map;
+    }
+
+    /**
+     * 更新用户信息
+     */
+    @PostMapping("")
+    public Msg update(SysUser user) {
+        userService.updateById(user);
+        return Msg.ok();
+    }
+
+    /**
+     * 获取用户信息
+     * @author jitwxs
+     * @since 2018/5/14 16:15
+     */
+    @GetMapping("/{id}")
+    public Msg getById(@PathVariable String id) {
+        SysUser user = userService.selectById(id);
+        return Msg.ok(null,user);
     }
 
     /**

@@ -11,7 +11,7 @@
  Target Server Version : 50719
  File Encoding         : 65001
 
- Date: 14/05/2018 14:13:35
+ Date: 14/05/2018 16:57:30
 */
 
 SET NAMES utf8mb4;
@@ -110,13 +110,9 @@ CREATE TABLE `feedback`  (
 -- ----------------------------
 -- Records of feedback
 -- ----------------------------
-INSERT INTO `feedback` VALUES ('1b231b06cabe4a2e94e2a807a468312b', '李梦', '14785214695', 2, '希望下单时增加价格计算功能', 0, NULL, '', '2018-04-23 00:49:42', NULL);
+INSERT INTO `feedback` VALUES ('1b231b06cabe4a2e94e2a807a468312b', '李梦', '14785214695', 2, '希望下单时增加价格计算功能', 1, 'e652d4ac148a49329fc0f9da0f8531a3', '该功能将在近期上线，感谢您的反馈。', '2018-04-23 00:49:42', '2018-05-14 15:15:27');
 INSERT INTO `feedback` VALUES ('679f0cade1ba4682a6fee12f3aa2119e', '张全蛋', '12367431229', 2, '希望接入在线支付', 0, NULL, '', '2018-04-23 00:49:44', NULL);
 INSERT INTO `feedback` VALUES ('813a121c72fe4d1bb7452d6414094da4', '王伟', '19741286542', 1, '手机停机，请重新派送', 1, '04663cac562d4585ace14e6f9a8044ee', '已为您重新派送', '2018-04-23 00:49:40', '2018-05-14 14:10:51');
-INSERT INTO `feedback` VALUES ('93fd0896b3c74aeda7a5da276634a43f', 'aa', '111111111111', 1, '1', 0, NULL, '', '2018-05-14 11:28:41', NULL);
-INSERT INTO `feedback` VALUES ('c1dad8eb9ee9431b9b7bd748e5851d06', 'aa', '111111111111', 1, '1', 0, NULL, '', '2018-05-14 11:28:06', NULL);
-INSERT INTO `feedback` VALUES ('d7c08cbbfcf545929fa8422b498fe955', 'aa', '111111111111', 1, '1', 0, NULL, '', '2018-05-14 11:33:30', NULL);
-INSERT INTO `feedback` VALUES ('dbce499c2f1248d18e69571e48a88d4f', 'aa', '111111111111', 1, '1', 0, NULL, '', '2018-05-14 11:28:33', NULL);
 
 -- ----------------------------
 -- Table structure for sys_user
@@ -140,9 +136,9 @@ CREATE TABLE `sys_user`  (
 -- ----------------------------
 -- Records of sys_user
 -- ----------------------------
-INSERT INTO `sys_user` VALUES ('04663cac562d4585ace14e6f9a8044ee', '李四', 'b2d1f375db625e65a4a63ba0c7b29bdd738392cd83c38b8216c10c4d', '17626014329', NULL, NULL, NULL, 1, 0, '2018-04-23 00:28:54', '2018-05-13 21:39:22');
-INSERT INTO `sys_user` VALUES ('ad0bfcd15f6142e0865715277cbcaf50', '小红', 'b2d1f375db625e65a4a63ba0c7b29bdd738392cd83c38b8216c10c4d', NULL, 'female', '北京市', NULL, 1, 0, '2018-04-23 00:29:22', '2018-05-14 14:12:32');
-INSERT INTO `sys_user` VALUES ('e652d4ac148a49329fc0f9da0f8531a3', 'admin', 'b2d1f375db625e65a4a63ba0c7b29bdd738392cd83c38b8216c10c4d', '18168404329', 'male', NULL, '1997-11-13 00:27:08', 0, 0, '2018-04-23 00:26:20', NULL);
-INSERT INTO `sys_user` VALUES ('fb13f057c76f4874915b44e2c406ce96', '张三', 'b2d1f375db625e65a4a63ba0c7b29bdd738392cd83c38b8216c10c4d', NULL, NULL, NULL, NULL, 1, 2, '2018-04-23 00:28:21', '2018-05-13 21:39:19');
+INSERT INTO `sys_user` VALUES ('04663cac562d4585ace14e6f9a8044ee', '李四', 'b2d1f375db625e65a4a63ba0c7b29bdd738392cd83c38b8216c10c4d', '12345678910', 'male', '南区十栋', '2018-05-14 00:00:00', 1, 2, '2018-04-23 00:28:54', '2018-05-14 16:56:27');
+INSERT INTO `sys_user` VALUES ('ad0bfcd15f6142e0865715277cbcaf50', '小红', 'b2d1f375db625e65a4a63ba0c7b29bdd738392cd83c38b8216c10c4d', '18943276592', 'female', '北区8栋A 503-2', '2018-05-01 00:00:00', 1, 0, '2018-04-23 00:29:22', '2018-05-14 16:56:21');
+INSERT INTO `sys_user` VALUES ('e652d4ac148a49329fc0f9da0f8531a3', 'admin', '0170d3940a0d0a179b3ad354bc528a8685fdb5ab061e00fde1eef54d', '18168404329', 'male', NULL, '1997-11-13 00:27:08', 0, 0, '2018-04-23 00:26:20', '2018-05-14 15:55:28');
+INSERT INTO `sys_user` VALUES ('fb13f057c76f4874915b44e2c406ce96', '张三', 'b2d1f375db625e65a4a63ba0c7b29bdd738392cd83c38b8216c10c4d', '138654285', 'male', '北区2栋B 301-3', '2007-03-15 00:00:00', 1, 2, '2018-04-23 00:28:21', '2018-05-14 16:55:49');
 
 SET FOREIGN_KEY_CHECKS = 1;
