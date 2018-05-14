@@ -1,4 +1,4 @@
-package jit.wxs.express.pojo.interactive;
+package jit.wxs.express.interactive;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -12,6 +12,10 @@ import java.util.Date;
  */
 public class ExpressSelectWrapper implements Serializable {
     private static final long serialVersionUID = 1L;
+    /**
+     * 订单号
+     */
+    private String id;
 
     /**
      * 订单状态
@@ -34,6 +38,11 @@ public class ExpressSelectWrapper implements Serializable {
     private String address;
 
     /**
+     * 配送员名
+     */
+    private String staffName;
+
+    /**
      * 是否删除
      */
     private Boolean hasDelete;
@@ -54,6 +63,14 @@ public class ExpressSelectWrapper implements Serializable {
      */
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date endDate;
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
 
     public Integer getStatus() {
         return status;
@@ -85,6 +102,14 @@ public class ExpressSelectWrapper implements Serializable {
 
     public void setAddress(String address) {
         this.address = address;
+    }
+
+    public String getStaffName() {
+        return staffName;
+    }
+
+    public void setStaffName(String staffName) {
+        this.staffName = staffName;
     }
 
     public Boolean getHasDelete() {

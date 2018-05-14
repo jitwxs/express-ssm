@@ -1,11 +1,13 @@
 package jit.wxs.express.controller;
 
 import jit.wxs.express.enums.RoleEnum;
+import jit.wxs.express.interactive.Msg;
 import jit.wxs.express.pojo.Express;
 import jit.wxs.express.pojo.Feedback;
 import jit.wxs.express.pojo.SysUser;
-import jit.wxs.express.pojo.interactive.Msg;
 import jit.wxs.express.service.FeedbackService;
+import jit.wxs.express.service.SysUserService;
+import jit.wxs.express.utils.PasswordUtils;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.subject.Subject;
@@ -28,6 +30,10 @@ import java.util.Date;
 public class SystemController {
     @Autowired
     private FeedbackService feedbackService;
+    @Autowired
+    private SysUserService userService;
+    @Autowired
+    private GlobalFunction globalFunction;
 
     @Value("${session.latest_express}")
     private String SESSION_LATEST_EXPRESS;
@@ -71,7 +77,7 @@ public class SystemController {
         if (subject.hasRole(RoleEnum.ADMIN.getName())) {
             return Msg.ok(null,"/admin/express");
         } else if (subject.hasRole(RoleEnum.STAFF.getName())) {
-            return Msg.ok(null,"/staff/express");
+            return Msg.ok(null,"/staff/home");
         }
 
         return Msg.error("授权失败");
@@ -126,5 +132,23 @@ public class SystemController {
 
         // 保存成功后跳转到支付页面
         return Msg.ok(null, "/payment");
+    }
+
+    /**
+     * 重置密码
+     * @author jitwxs
+     * @since 2018/5/14 15:49
+     */
+    @PostMapping("/password")
+    public Msg resetPassword(String oldPassword, String newPassword) {
+        SysUser user = globalFunction.getUser();
+
+        if(!PasswordUtils.validatePassword(oldPassword, user.getPassword())) {
+            return Msg.error("原始密码错误");
+        } else {
+            user.setPassword(PasswordUtils.entryptPassword(newPassword));
+            userService.updateById(user);
+            return Msg.ok();
+        }
     }
 }

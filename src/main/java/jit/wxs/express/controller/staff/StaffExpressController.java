@@ -1,4 +1,4 @@
-package jit.wxs.express.controller.admin;
+package jit.wxs.express.controller.staff;
 
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.plugins.Page;
@@ -21,19 +21,18 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 管理员订单Controller
  * @author jitwxs
- * @date 2018/5/2 0:21
+ * @since 2018/5/14 17:38
  */
 @RestController
-@RequestMapping("/admin/express")
-public class ExpressController {
+@RequestMapping("/staff/express")
+public class StaffExpressController {
     @Autowired
     private ExpressService expressService;
     @Autowired
-    private GlobalFunction globalFunction;
-    @Autowired
     private ExpressPaymentService expressPaymentService;
+    @Autowired
+    private GlobalFunction globalFunction;
 
     /**
      * 获取订单的状态列表
@@ -53,23 +52,52 @@ public class ExpressController {
     }
 
     /**
-     * 订单列表
-     * @param esw 筛选条件
+     * 获取所有等待接单的订单
      * @author jitwxs
-     * @since 2018/5/2 0:33
+     * @since 2018/5/14 17:39
      */
-    @GetMapping("/list")
+    @RequestMapping("/list")
     public Map listExpress(Integer rows, Integer page, ExpressSelectWrapper esw) {
         // Get请求中文编码
         try {
             esw.setName(globalFunction.iso8859ToUtf8(esw.getName()));
+            esw.setAddress(globalFunction.iso8859ToUtf8(esw.getAddress()));
             esw.setStaffName(globalFunction.iso8859ToUtf8(esw.getStaffName()));
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        // 得到筛选条件
+        EntityWrapper<Express> expressWrapper = globalFunction.getExpressWrapper(esw);
+        // 设置仅查找等待接单的订单
+        expressWrapper.eq("status", ExpressStatusEnum.WAIT_DIST.getIndex());
+        Page<Express> selectPage = expressService.selectPage(new Page<>(page, rows), expressWrapper);
+
+        List<ExpressDto> list = globalFunction.express2dto(selectPage.getRecords());
+
+        Map<String,Object> map = new HashMap<>();
+        map.put("total", selectPage.getTotal());
+        map.put("rows", list);
+        return map;
+    }
+
+    /**
+     * 获取所有个人的订单
+     * @author jitwxs
+     * @since 2018/5/14 17:39
+     */
+    @RequestMapping("/selfList")
+    public Map listSelfExpress(Integer rows, Integer page, ExpressSelectWrapper esw) {
+        // Get请求中文编码
+        try {
+            esw.setName(globalFunction.iso8859ToUtf8(esw.getName()));
             esw.setAddress(globalFunction.iso8859ToUtf8(esw.getAddress()));
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
         // 得到筛选条件
         EntityWrapper<Express> expressWrapper = globalFunction.getExpressWrapper(esw);
+        // 设置查找当前用户的订单
+        expressWrapper.eq("staff", globalFunction.getUserId());
         Page<Express> selectPage = expressService.selectPage(new Page<>(page, rows), expressWrapper);
 
         List<ExpressDto> list = globalFunction.express2dto(selectPage.getRecords());
@@ -94,22 +122,18 @@ public class ExpressController {
     }
 
     /**
-     * 分配订单
-     * @param ids 订单数组
-     * @param staffId 派送员id
+     * 接单
      * @author jitwxs
-     * @since 2018/5/2 16:37
+     * @since 2018/5/14 17:45
      */
-    @PostMapping("/assign")
-    public Msg assignExpress(String[] ids,String staffId) {
+    @PostMapping("")
+    public Msg acceptExpress(String[] ids) {
         for(String id : ids) {
             Express express = expressService.selectById(id);
-            // 只有订单状态为WAIT_DIST时才要分配订单
-            if(ExpressStatusEnum.WAIT_DIST.getName().equals(ExpressStatusEnum.getName(express.getStatus()))) {
-                express.setStaff(staffId);
-                express.setStatus(ExpressStatusEnum.TRANSPORT.getIndex());
-                expressService.updateById(express);
-            }
+
+            express.setStaff(globalFunction.getUserId());
+            express.setStatus(ExpressStatusEnum.TRANSPORT.getIndex());
+            expressService.updateById(express);
         }
         return Msg.ok();
     }
@@ -147,55 +171,6 @@ public class ExpressController {
                 express.setStaffRemark(text);
                 expressService.updateById(express);
             }
-        }
-        return Msg.ok();
-    }
-
-    /**
-     * 删除订单
-     * @author jitwxs
-     * @since 2018/5/2 14:05
-     */
-    @PostMapping("/delete")
-    public Msg deleteById(String[] ids) {
-        for(String id : ids) {
-            Express express = expressService.selectById(id);
-            if(express != null) {
-                // 设置删除标记为true
-                express.setHasDelete(true);
-                expressService.updateById(express);
-            }
-        }
-        return Msg.ok();
-    }
-
-    /**
-     * 恢复订单
-     * @author jitwxs
-     * @since 2018/5/2 14:05
-     */
-    @PostMapping("/recycle")
-    public Msg recycleById(String[] ids) {
-        for(String id : ids) {
-            Express express = expressService.selectById(id);
-            if(express != null) {
-                // 设置删除标记为false
-                express.setHasDelete(false);
-                expressService.updateById(express);
-            }
-        }
-        return Msg.ok();
-    }
-
-    /**
-     * 彻底删除订单
-     * @author jitwxs
-     * @since 2018/5/2 14:05
-     */
-    @PostMapping("/clean")
-    public Msg cleanById(String[] ids) {
-        for(String id : ids) {
-            expressService.deleteById(id);
         }
         return Msg.ok();
     }

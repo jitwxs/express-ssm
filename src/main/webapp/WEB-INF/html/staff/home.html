@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>订单回收 - 快递代拿系统</title>
+    <title>接单大厅 - 快递代拿系统</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
 
@@ -33,15 +33,14 @@
             </div>
         </div>
     </nav>
+    <!-- 主体 -->
     <div class="row">
         <!-- 左侧菜单 -->
         <div class="col-md-2">
             <ul class="nav nav-pills nav-stacked" id="nav">
-                <li><a href="/admin/express">订单管理<span class="glyphicon glyphicon-tasks pull-right"/></a></li>
-                <li><a href="/admin/staff">人员管理<span class="glyphicon glyphicon-user pull-right"/></a></li>
-                <li class="active"><a href="/admin/expressRecycle">订单回收<span class="glyphicon glyphicon-trash pull-right"/></a></li>
-                <li><a href="/admin/feedback">用户反馈<span class="glyphicon glyphicon-envelope pull-right"/></a></li>
-                <li><a href="/admin/password">重置密码<sapn class="glyphicon glyphicon-pencil pull-right" /></a></li>
+                <li class="active"><a href="/staff/home">接单大厅<span class="glyphicon glyphicon-home pull-right"/></a></li>
+                <li><a href="/staff/express">我的订单<span class="glyphicon glyphicon-user pull-right"/></a></li>
+                <li><a href="/staff/password">修改密码<sapn class="glyphicon glyphicon-pencil pull-right" /></a></li>
                 <li><a href="/logout">退出系统<sapn class="glyphicon glyphicon-log-out pull-right" /></a></li>
             </ul>
         </div>
@@ -51,12 +50,6 @@
             <div class="panel-heading">
                 <form class="form-inline">
                     <div class="form-group">
-                        <label for="inputStatus">订单状态</label>
-                        <select id="inputStatus" class="form-control">
-                            <option value="-1">所有状态</option>
-                        </select>
-                    </div>
-                    <div class="form-group ml10">
                         <label for="inputIncludeDay">查询日期</label>
                         <select id="inputIncludeDay" class="form-control">
                             <option value="-1">无</option>
@@ -73,13 +66,7 @@
                         <input type="date" id="inputEndDate" class="form-control ml10">
                     </div>
                     <div class="form-group">
-                        <label for="inputStaffName" class="ml10">配送员</label>
-                        <input type="text" class="form-control" id="inputStaffName">
-                    </div>
-                </form>
-                <form class="form-inline pt10">
-                    <div class="form-group">
-                        <label for="inputId">订单号</label>
+                        <label for="inputId" class="ml10">订单号</label>
                         <input type="text" class="form-control" id="inputId">
                     </div>
                     <div class="form-group">
@@ -99,16 +86,14 @@
             </div>
             <div class="panel-body">
                 <div id="toolbar" class="btn-group">
-                    <button id="btn_recycle" type="button" class="btn btn-default">
-                        <span class="glyphicon glyphicon-repeat" aria-hidden="true"></span> 恢复
-                    </button>
-                    <button id="btn_delete" type="button" class="btn btn-default">
-                        <span class="glyphicon glyphicon-remove" aria-hidden="true"></span> 删除
+                    <button id="btn_accept" type="button" class="btn btn-default">
+                        <span class="glyphicon glyphicon-check" aria-hidden="true"></span> 接单
                     </button>
                 </div>
                 <table id="tb_express"></table>
             </div>
         </div>
+
         <!-- 订单详情模态框 -->
         <div class="modal fade" id="infoModel" tabindex="-1" role="dialog" aria-labelledby="infoModelLabel">
             <div class="modal-dialog" role="document">
@@ -154,18 +139,6 @@
                                 <label for="inputInfoPayment" class="col-sm-2 control-label">支付方式</label>
                                 <div class="col-sm-10">
                                     <p class="form-control-static" id="inputInfoPayment"></p>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label for="inputInfoPaymentOnline" class="col-sm-2 control-label">线上支付</label>
-                                <div class="col-sm-10">
-                                    <p class="form-control-static" id="inputInfoPaymentOnline"></p>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label for="inputInfoPaymentOffline" class="col-sm-2 control-label">线下支付</label>
-                                <div class="col-sm-10">
-                                    <p class="form-control-static" id="inputInfoPaymentOffline"></p>
                                 </div>
                             </div>
                             <div class="form-group">
@@ -229,19 +202,6 @@
         }, function () {
             $.message({message: '未知错误', type: 'error'});
         });
-
-        // 初始化订单状态下拉框
-        sendJson("get", "/admin/express/status", {}, true, function (res) {
-            if (res.status) {
-                var html = '<option value="-1">所有状态</option>';
-                for(var i=0;i<res.data.length;i++) {
-                    html += '<option value="'+res.data[i].id+'">'+res.data[i].name+'</option>';
-                }
-                document.getElementById("inputStatus").innerHTML = html;
-            }
-        }, function () {
-            $.message({message: '未知错误', type: 'error'});
-        });
     });
 
     var TableInit = function () {
@@ -249,7 +209,7 @@
         //初始化Table
         oTableInit.Init = function () {
             $('#tb_express').bootstrapTable({
-                url: '/admin/express/list',         //请求后台的URL（*）
+                url: '/staff/express/list',         //请求后台的URL（*）
                 method: 'get',                      //请求方式（*）
                 toolbar: '#toolbar',                //工具按钮组id
                 striped: true,                      //是否显示行间隔色
@@ -267,7 +227,7 @@
                 showRefresh: true,                  //是否显示刷新按钮
                 minimumCountColumns: 2,             //最少允许的列数
                 clickToSelect: true,                //是否启用点击选中行
-                // height: 750,                        //行高，如果没有设置height属性，表格自动根据记录条数觉得表格高度
+                // height: 750,                     //行高，如果没有设置height属性，表格自动根据记录条数觉得表格高度
                 uniqueId: "id",                     //每一行的唯一标识，一般为主键列
                 showToggle:false,                   //是否显示详细视图和列表视图的切换按钮
                 cardView: false,                    //是否显示详细视图
@@ -293,12 +253,6 @@
                     field: 'createDate',
                     title: '下单时间'
                 }, {
-                    field: 'staffName',
-                    title: '配送员'
-                }, {
-                    field: 'statusName',
-                    title: '订单状态'
-                }, {
                     field: 'id',
                     title: '操作',
                     width: 120,
@@ -315,12 +269,10 @@
                 rows: params.limit,                         //页面大小
                 page: (params.offset / params.limit) + 1,   //页码
                 // 筛选参数
-                hasDelete: true,
-                status: $("#inputStatus").val(),
+                hasDelete: false,
                 includeDay: $("#inputIncludeDay").val(),
                 startDate: $("#inputStartDate").val(),
                 endDate:$("#inputEndDate").val(),
-                staffName: $("#inputStaffName").val(),
                 id: $("#inputId").val(),
                 tel: $("#inputTel").val(),
                 name: $("#inputName").val(),
@@ -332,21 +284,21 @@
 
     var ButtonInit = function () {
         var oInit = new Object();
-        var postdata = {};
 
         oInit.Init = function () {
-            // 恢复订单
-            $("#btn_recycle").click(function () {
+            // 确认订单
+            $("#btn_accept").click(function () {
                 var row = $('#tb_express').bootstrapTable("getSelections");
+                // 获取所有派送中（2）的选中订单
                 if(row.length > 0) {
                     var ids = new Array();
                     for (var i = 0; i < row.length; i++) {
                         ids.push(row[i].id);
                     }
 
-                    var msg = "即将恢复订单：" + ids + "，确认执行？";
+                    var msg = "即将接单订单：" + ids + "，确认执行？";
                     if(confirm(msg)) {
-                        sendArray("post", "/admin/express/recycle", {"ids": ids}, false, function (res) {
+                        sendArray("post", "/staff/express", {"ids": ids}, false, function (res) {
                             // 当操作成功时，刷新表格
                             if(res.status) {
                                 flushTable();
@@ -356,50 +308,26 @@
                         });
                     }
                 }
-            });
 
-            // 删除订单
-            $("#btn_delete").click(function () {
-                var row = $('#tb_express').bootstrapTable("getSelections");
-                if (row.length > 0) {
-                    var ids = new Array();
-                    for (var i = 0; i < row.length; i++) {
-                        ids.push(row[i].id);
-                    }
-                    var msg = "即将彻底删除订单：" + ids + "，删除后无法恢复，确认执行？";
-                    if (!confirm(msg)) {
-                        return false;
-                    }
-                    sendArray("post", "/admin/express/clean", {"ids": ids}, false, function (res) {
-                        // 当操作成功时，刷新表格
-                        if (res.status) {
-                            flushTable();
-                        }
-                    }, function () {
-                        $.message({message: '未知错误', type: 'error'});
-                    });
-                }
             });
         };
         return oInit;
     };
-
     //操作栏的格式化
     function actionFormatter(value, row, index) {
-        var id = value;
+        var id = "'" + value + "'";
         var result = '<button class="btn btn-xs btn-info" onclick="showExpress('+id+')" title="查看"><span class="glyphicon glyphicon-search"></span></button>\n' +
-            '         <button class="btn btn-xs btn-warning" onclick="recycleExpress('+id+')" title="还原"><span class="glyphicon glyphicon-repeat"></span></button>\n' +
-            '         <button class="btn btn-xs btn-danger" onclick="deleteExpress('+id+')" title="删除"><span class="glyphicon glyphicon-remove"></span></button>';
+            '         <button class="btn btn-xs btn-primary" onclick="acceptExpress('+id+')" title="接单"><span class="glyphicon glyphicon-ok"></span></button>';
         return result;
     }
-
+    
     function flushTable() {
-        $("#tb_express").bootstrapTable('refresh',{url : '/admin/express/list'} );
+        $("#tb_express").bootstrapTable('refresh',{url : '/staff/express/list'} );
     }
 
     // 查看订单
     function showExpress(id) {
-        sendJson("get", "/admin/express/" + id, {}, false, function (res) {
+        sendJson("get", "/staff/express/" + id, {}, false, function (res) {
             if (res.status) {
                 // 初始化模态框信息
                 var data = res.data;
@@ -409,9 +337,7 @@
                 $("#inputInfoAddress").text(data.address);
                 $("#inputInfoRemark").text(data.remark);
                 $("#inputInfoPayment").text(data.paymentType);
-                $("#inputInfoPaymentOnline").text(data.onlinePayment);
-                $("#inputInfoPaymentOffline").text(data.offlinePayment);
-                $("#inputInfoStatus").text(data.statusName);
+                $("#inputInfoStatus").html(data.statusName);
                 $("#inputInfoStaff").text(data.staffName);
                 $("#inputInfoStaffRemark").text(data.staffRemark);
                 $("#inputInfoDate").text(data.createDate);
@@ -424,29 +350,14 @@
             $.message({message: '未知错误', type: 'error'});
         });
     }
-    
-    // 恢复订单
-    function recycleExpress(id) {
-        var msg = "即将恢复订单：" + id + "，确认执行？";
+
+    // 查看订单
+    function acceptExpress(id) {
+        var msg = "即将接单订单：" + id + "，确认执行？";
         if(confirm(msg)) {
-            sendArray("post", "/admin/express/recycle", {"ids": id}, false, function (res) {
+            sendArray("post", "/staff/express", {"ids": id}, false, function (res) {
                 // 当操作成功时，刷新表格
                 if(res.status) {
-                    flushTable();
-                }
-            }, function () {
-                $.message({message: '未知错误', type: 'error'});
-            });
-        }
-    }
-
-    // 删除订单
-    function deleteExpress(id) {
-        var msg = "即将彻底删除订单：" + id + "，删除后无法恢复，确认执行？";
-        if (confirm(msg)) {
-            sendArray("post", "/admin/express/clean", {"ids": id}, false, function (res) {
-                // 当操作成功时，刷新表格
-                if (res.status) {
                     flushTable();
                 }
             }, function () {

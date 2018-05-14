@@ -1,4 +1,4 @@
-package jit.wxs.express.pojo.interactive;
+package jit.wxs.express.interactive;
 
 import java.io.Serializable;
 

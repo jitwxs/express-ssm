@@ -1,10 +1,10 @@
 package jit.wxs.express.controller.admin;
 
+import jit.wxs.express.controller.GlobalFunction;
+import jit.wxs.express.interactive.Msg;
 import jit.wxs.express.pojo.SysUser;
-import jit.wxs.express.pojo.interactive.Msg;
 import jit.wxs.express.service.SysUserService;
 import jit.wxs.express.utils.PasswordUtils;
-import org.apache.shiro.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,6 +20,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class PasswordController {
     @Autowired
     private SysUserService userService;
+    @Autowired
+    private GlobalFunction globalFunction;
 
     /**
      * 重置密码
@@ -28,8 +30,7 @@ public class PasswordController {
      */
     @PostMapping("/reset")
     public Msg resetPassword(String oldPassword, String newPassword) {
-        String username = (String)SecurityUtils.getSubject().getPrincipal();
-        SysUser user = userService.getByUserName(username);
+        SysUser user = globalFunction.getUser();
 
         if(!PasswordUtils.validatePassword(oldPassword, user.getPassword())) {
             return Msg.error("原始密码错误");
@@ -38,7 +39,5 @@ public class PasswordController {
             userService.updateById(user);
             return Msg.ok();
         }
-
     }
-
 }

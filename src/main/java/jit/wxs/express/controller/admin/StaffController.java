@@ -2,15 +2,14 @@ package jit.wxs.express.controller.admin;
 
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.plugins.Page;
+import jit.wxs.express.controller.GlobalFunction;
 import jit.wxs.express.dto.SysUserDto;
 import jit.wxs.express.enums.RoleEnum;
 import jit.wxs.express.enums.SysUserStatusEnum;
+import jit.wxs.express.interactive.Msg;
+import jit.wxs.express.interactive.SysUserSelectWrapper;
 import jit.wxs.express.pojo.SysUser;
-import jit.wxs.express.pojo.interactive.Msg;
-import jit.wxs.express.pojo.interactive.SysUserSelectWrapper;
 import jit.wxs.express.service.SysUserService;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,56 +29,8 @@ import java.util.Map;
 public class StaffController {
     @Autowired
     private SysUserService userService;
-
-    private List<SysUserDto> sysUser2dto(List<SysUser> userList) {
-        List<SysUserDto> result = new ArrayList<>();
-        for(SysUser user : userList) {
-            result.add(sysUser2dto(user));
-        }
-        return result;
-    }
-
-    private SysUserDto sysUser2dto(SysUser user) {
-        SysUserDto dto = new SysUserDto();
-        BeanUtils.copyProperties(user,dto);
-
-        // 设置角色名称
-        String roleName = RoleEnum.getName(dto.getRoleId());
-        dto.setRoleName(roleName);
-
-        // 设置用户状态名称
-        String statusName = SysUserStatusEnum.getName(dto.getStatus());
-        dto.setStatusName(statusName);
-
-        return dto;
-    }
-
-    /**
-     * 构造筛选条件
-     * @author jitwxs
-     * @since 2018/5/13 15:50
-     */
-    private EntityWrapper<SysUser> getSysUserWrapper(SysUserSelectWrapper usw) {
-        EntityWrapper<SysUser> entityWrapper = new EntityWrapper<>();
-
-        // 前台传递，状态-1表示所有状态
-        if(usw.getStatus() != null && usw.getStatus() != -1) {
-            entityWrapper.eq("status", usw.getStatus());
-        }
-        if(StringUtils.isNotBlank(usw.getTel())){
-            entityWrapper.eq("tel", usw.getTel());
-        }
-        if(StringUtils.isNotBlank(usw.getSex())) {
-            entityWrapper.eq("sex", usw.getSex());
-        }
-        if(StringUtils.isNotBlank(usw.getName())){
-            entityWrapper.like("username", usw.getName());
-        }
-        if(StringUtils.isNotBlank(usw.getAddress())){
-            entityWrapper.like("address", usw.getAddress());
-        }
-        return entityWrapper;
-    }
+    @Autowired
+    private GlobalFunction globalFunction;
 
     private void changeUserStatus(String[] ids, Integer status) {
         for(String id : ids) {
@@ -130,25 +81,19 @@ public class StaffController {
     public Map listStaff(Integer rows, Integer page, SysUserSelectWrapper usw) {
         // Get请求中文编码
         try {
-            String name = usw.getName();
-            if(StringUtils.isNotBlank(name)) {
-                usw.setName(new String(name.getBytes("iso8859-1"),"utf-8"));
-            }
-            String address = usw.getAddress();
-            if(StringUtils.isNotBlank(address)) {
-                usw.setAddress(new String(address.getBytes("iso8859-1"),"utf-8"));
-            }
+            usw.setName(globalFunction.iso8859ToUtf8(usw.getName()));
+            usw.setAddress(globalFunction.iso8859ToUtf8(usw.getAddress()));
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
 
         // 得到筛选条件
-        EntityWrapper<SysUser> userWrapper = getSysUserWrapper(usw);
+        EntityWrapper<SysUser> userWrapper = globalFunction.getSysUserWrapper(usw);
         // 不显示admin角色
         userWrapper.ne("role_id", RoleEnum.ADMIN.getIndex());
         Page<SysUser> selectPage = userService.selectPage(new Page<>(page, rows), userWrapper);
 
-        List<SysUserDto> list = sysUser2dto(selectPage.getRecords());
+        List<SysUserDto> list = globalFunction.sysUser2dto(selectPage.getRecords());
 
         Map<String,Object> map = new HashMap<>();
         map.put("total", selectPage.getTotal());

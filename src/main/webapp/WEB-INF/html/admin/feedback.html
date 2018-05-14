@@ -66,12 +66,20 @@
                         </select>
                     </div>
                     <div class="form-group">
+                        <label for="inputStaffId" class="ml10">反馈号</label>
+                        <input type="text" class="form-control" id="inputStaffId">
+                    </div>
+                    <div class="form-group">
                         <label for="inputName">姓名</label>
                         <input type="text" class="form-control" id="inputName">
                     </div>
                     <div class="form-group">
                         <label for="inputTel" class="ml10">联系电话</label>
                         <input type="text" class="form-control" id="inputTel" onkeyup="this.value=this.value.replace(/\D/g,'')" onafterpaste="this.value=this.value.replace(/\D/g,'')">
+                    </div>
+                    <div class="form-group">
+                        <label for="inputStaffName" class="ml10">处理人</label>
+                        <input type="text" class="form-control" id="inputStaffName">
                     </div>
                     <button type="button" class="btn btn-info ml10" onclick="flushTable()">条件查询</button>
                 </form>
@@ -117,6 +125,8 @@
 <script src="../../../js/bootstrap.min.js"></script>
 <script src="../../../js/bootstrap-table.min.js"></script>
 <script src="../../../js/bootstrap-table-zh-CN.min.js"></script>
+<script src="../../../js/bootstrap-table-export.min.js"></script>
+<script src="../../../js/tableExport.min.js"></script>
 <script src="../../../js/message.js"></script>
 <script src="../../../js/http.js"></script>
 <script type="text/javascript">
@@ -180,6 +190,8 @@
                 showToggle:false,                   //是否显示详细视图和列表视图的切换按钮
                 cardView: false,                    //是否显示详细视图
                 detailView: false,                  //是否显示父子表
+                showExport: true,                   //是否显示导出
+                exportDataType: "basic",            //导出的模式是当前页basic、所有数据all、选中数据selected。
                 columns: [{
                     checkbox: true
                 }, {
@@ -229,8 +241,10 @@
                 // 筛选参数
                 type: $("#inputType").val(),
                 status: $("#inputStatus").val(),
+                id: $("#inputStaffId").val(),
                 tel: $("#inputTel").val(),
-                name: $("#inputName").val()
+                name: $("#inputName").val(),
+                staffName: $("#inputStaffName").val()
             };
         };
         return oTableInit;

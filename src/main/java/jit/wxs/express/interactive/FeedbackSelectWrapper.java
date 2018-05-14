@@ -1,4 +1,4 @@
-package jit.wxs.express.pojo.interactive;
+package jit.wxs.express.interactive;
 
 /**
  * 反馈筛选条件
@@ -16,6 +16,8 @@ public class FeedbackSelectWrapper {
      */
     private Integer status;
 
+    private String id;
+
     /**
      * 反馈人姓名
      */
@@ -25,6 +27,11 @@ public class FeedbackSelectWrapper {
      * 反馈人手机号码
      */
     private String tel;
+
+    /**
+     * 处理人姓名
+     */
+    private String staffName;
 
     public Integer getType() {
         return type;
@@ -42,6 +49,14 @@ public class FeedbackSelectWrapper {
         this.status = status;
     }
 
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
     public String getName() {
         return name;
     }
@@ -56,5 +71,13 @@ public class FeedbackSelectWrapper {
 
     public void setTel(String tel) {
         this.tel = tel;
+    }
+
+    public String getStaffName() {
+        return staffName;
+    }
+
+    public void setStaffName(String staffName) {
+        this.staffName = staffName;
     }
 }

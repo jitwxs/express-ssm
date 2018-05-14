@@ -41,7 +41,7 @@ public class PageController {
     }
 
     @GetMapping("/admin/express")
-    public String showExpress() {
+    public String showAExpress() {
         return "admin/express";
     }
 
@@ -63,5 +63,20 @@ public class PageController {
     @GetMapping("/admin/password")
     public String showPassword() {
         return "admin/password";
+    }
+
+    @GetMapping("/staff/home")
+    public String showStaffHome() {
+        return "staff/home";
+    }
+
+    @GetMapping("/staff/express")
+    public String showStaffExpress() {
+        return "staff/express";
+    }
+
+    @GetMapping("/staff/password")
+    public String showStaffPassword() {
+        return "staff/password";
     }
 }

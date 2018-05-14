@@ -158,6 +158,8 @@
 <script src="../../../js/bootstrap.min.js"></script>
 <script src="../../../js/bootstrap-table.min.js"></script>
 <script src="../../../js/bootstrap-table-zh-CN.min.js"></script>
+<script src="../../../js/bootstrap-table-export.min.js"></script>
+<script src="../../../js/tableExport.min.js"></script>
 <script src="../../../js/message.js"></script>
 <script src="../../../js/http.js"></script>
 <script type="text/javascript">
@@ -221,6 +223,8 @@
                 showToggle:false,                   //是否显示详细视图和列表视图的切换按钮
                 cardView: false,                    //是否显示详细视图
                 detailView: false,                  //是否显示父子表
+                showExport: true,                   //是否显示导出
+                exportDataType: "basic",            //导出的模式是当前页basic、所有数据all、选中数据selected。
                 columns: [{
                     checkbox: true
                 }, {

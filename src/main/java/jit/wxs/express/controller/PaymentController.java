@@ -4,7 +4,7 @@ import jit.wxs.express.enums.ExpressStatusEnum;
 import jit.wxs.express.enums.PaymentEnum;
 import jit.wxs.express.pojo.Express;
 import jit.wxs.express.pojo.ExpressPayment;
-import jit.wxs.express.pojo.interactive.Msg;
+import jit.wxs.express.interactive.Msg;
 import jit.wxs.express.service.ExpressPaymentService;
 import jit.wxs.express.service.ExpressService;
 import org.apache.commons.lang3.StringUtils;
@@ -81,9 +81,6 @@ public class PaymentController {
         ExpressPayment payment = new ExpressPayment();
         payment.setExpressId(express.getId());
         payment.setCreateDate(new Date());
-
-//        // 将金额转换为double，避免精度损失
-//        double dm = Double.parseDouble(String.valueOf(money));
 
         // 线下支付
         if(type == PaymentEnum.OFFLINE.getIndex()) {
