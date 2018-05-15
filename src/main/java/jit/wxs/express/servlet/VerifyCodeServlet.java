@@ -33,7 +33,7 @@ public class VerifyCodeServlet extends HttpServlet {
     /**
      * 验证码字符个数
      */
-    private int codeCount = 1;
+    private int codeCount = 4;
 
     /**
      * 字体高度

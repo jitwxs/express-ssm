@@ -1,0 +1,2 @@
+# 将html表示为java，避免github项目类别错误
+*.html linguist-language=java
