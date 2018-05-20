@@ -6,10 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
 
-    <link rel="stylesheet" href="../../../css/bootstrap.css"/>
-    <link rel="stylesheet" href="../../../css/bootstrap-table.css"/>
-    <link rel="stylesheet" href="../../../css/message.css"/>
-    <link rel="stylesheet" href="../../../css/express.css">
+    <link rel="stylesheet" href="../../../assets/css/bootstrap.css"/>
+    <link rel="stylesheet" href="../../../assets/css/bootstrap-table.css"/>
+    <link rel="stylesheet" href="../../../assets/css/express.css">
 </head>
 <body>
 <div class="container-fluid">
@@ -176,14 +175,14 @@
     </div>
 </div>
 
-<script src="../../../js/jquery3.3.1.min.js"></script>
-<script src="../../../js/bootstrap.min.js"></script>
-<script src="../../../js/bootstrap-table.min.js"></script>
-<script src="../../../js/bootstrap-table-zh-CN.min.js"></script>
-<script src="../../../js/bootstrap-table-export.min.js"></script>
-<script src="../../../js/tableExport.min.js"></script>
-<script src="../../../js/message.js"></script>
-<script src="../../../js/http.js"></script>
+<script src="../../../assets/js/jquery3.3.1.min.js"></script>
+<script src="../../../assets/js/bootstrap.min.js"></script>
+<script src="../../../assets/js/bootstrap-table.min.js"></script>
+<script src="../../../assets/js/bootstrap-table-zh-CN.min.js"></script>
+<script src="../../../assets/js/bootstrap-table-export.min.js"></script>
+<script src="../../../assets/js/tableExport.min.js"></script>
+<script src="../../../assets/layer/layer.js"></script>
+<script src="../../../assets/js/http.js"></script>
 <script type="text/javascript">
     $(function () {
         //1、初始化Table
@@ -200,7 +199,7 @@
                 $("#showUser").text(res.data);
             }
         }, function () {
-            $.message({message: '未知错误', type: 'error'});
+            layer.msg("未知错误",{icon:2});
         });
     });
 
@@ -296,17 +295,22 @@
                         ids.push(row[i].id);
                     }
 
-                    var msg = "即将接单订单：" + ids + "，确认执行？";
-                    if(confirm(msg)) {
+                    layer.confirm("即将接单：" + ids + "，确认执行？", {
+                        btn: ['确定','取消']
+                    }, function(){
                         sendArray("post", "/staff/express", {"ids": ids}, false, function (res) {
                             // 当操作成功时，刷新表格
                             if(res.status) {
+                                layer.msg("操作成功",{icon:1});
                                 flushTable();
+                            } else {
+                                layer.msg("操作失败",{icon:2});
                             }
                         }, function () {
-                            $.message({message: '未知错误', type: 'error'});
+                            layer.msg("未知错误",{icon:2});
                         });
-                    }
+                    }, function(){
+                    });
                 }
 
             });
@@ -347,23 +351,28 @@
                 $.message({message: '获取订单详情失败', type: 'error'});
             }
         }, function () {
-            $.message({message: '未知错误', type: 'error'});
+            layer.msg("未知错误",{icon:2});
         });
     }
 
     // 查看订单
     function acceptExpress(id) {
-        var msg = "即将接单订单：" + id + "，确认执行？";
-        if(confirm(msg)) {
+        layer.confirm("即将接单：" + id + "，确认执行？", {
+            btn: ['确定','取消']
+        }, function(){
             sendArray("post", "/staff/express", {"ids": id}, false, function (res) {
                 // 当操作成功时，刷新表格
                 if(res.status) {
+                    layer.msg("操作成功",{icon:1});
                     flushTable();
+                } else {
+                    layer.msg("操作失败",{icon:2});
                 }
             }, function () {
-                $.message({message: '未知错误', type: 'error'});
+                layer.msg("未知错误",{icon:2});
             });
-        }
+        }, function(){
+        });
     }
 </script>
 </body>

@@ -6,10 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
 
-    <link rel="stylesheet" href="../../../css/bootstrap.css"/>
-    <link rel="stylesheet" href="../../../css/bootstrap-table.css"/>
-    <link rel="stylesheet" href="../../../css/message.css"/>
-    <link rel="stylesheet" href="../../../css/express.css">
+    <link rel="stylesheet" href="../../../assets/css/bootstrap.css"/>
+    <link rel="stylesheet" href="../../../assets/css/bootstrap-table.css"/>
+    <link rel="stylesheet" href="../../../assets/css/express.css">
 </head>
 <body>
 <div class="container-fluid">
@@ -121,14 +120,14 @@
         </div>
     </div>
 </div>
-<script src="../../../js/jquery3.3.1.min.js"></script>
-<script src="../../../js/bootstrap.min.js"></script>
-<script src="../../../js/bootstrap-table.min.js"></script>
-<script src="../../../js/bootstrap-table-zh-CN.min.js"></script>
-<script src="../../../js/bootstrap-table-export.min.js"></script>
-<script src="../../../js/tableExport.min.js"></script>
-<script src="../../../js/message.js"></script>
-<script src="../../../js/http.js"></script>
+<script src="../../../assets/js/jquery3.3.1.min.js"></script>
+<script src="../../../assets/js/bootstrap.min.js"></script>
+<script src="../../../assets/js/bootstrap-table.min.js"></script>
+<script src="../../../assets/js/bootstrap-table-zh-CN.min.js"></script>
+<script src="../../../assets/js/bootstrap-table-export.min.js"></script>
+<script src="../../../assets/js/tableExport.min.js"></script>
+<script src="../../../assets/js/http.js"></script>
+<script src="../../../assets/layer/layer.js"></script>
 <script type="text/javascript">
     $(function () {
         //1、初始化Table
@@ -145,7 +144,7 @@
                 $("#showUser").text(res.data);
             }
         }, function () {
-            $.message({message: '未知错误', type: 'error'});
+            layer.msg("未知错误",{icon:2});
         });
 
         // 初始化反馈类型下拉框
@@ -158,7 +157,7 @@
                 document.getElementById("inputType").innerHTML = html;
             }
         }, function () {
-            $.message({message: '未知错误', type: 'error'});
+            layer.msg("未知错误",{icon:2});
         });
     });
 
@@ -226,7 +225,7 @@
                     field: 'id',
                     title: '操作',
                     width: 120,
-                    align: 'center',
+                    align: 'left',
                     valign: 'middle',
                     formatter: actionFormatter
                 }]
@@ -261,17 +260,23 @@
                     for (var i = 0; i < row.length; i++) {
                         ids.push(row[i].id);
                     }
-                    var msg = "即将删除反馈：" + ids + "，删除后反馈将无法恢复，确认执行？";
-                    if (confirm(msg)) {
+
+                    layer.confirm("即将删除反馈：" + ids + "，删除后反馈将无法恢复，确认执行？", {
+                        btn: ['确定','取消']
+                    }, function(){
                         sendArray("post", "/admin/feedback/delete", {"ids": ids}, false, function (res) {
                             // 当操作成功时，刷新表格
-                            if (res.status) {
+                            if(res.status) {
+                                layer.msg("操作成功",{icon:1});
                                 flushTable();
+                            } else {
+                                layer.msg("操作失败",{icon:2});
                             }
                         }, function () {
-                            $.message({message: '未知错误', type: 'error'});
+                            layer.msg("未知错误",{icon:2});
                         });
-                    }
+                    }, function(){
+                    });
                 }
             });
         };
@@ -308,24 +313,29 @@
                     flushTable();
                 }
             }, function () {
-                $.message({message: '未知错误', type: 'error'});
+                layer.msg("未知错误",{icon:2});
             });
         });
     }
 
     // 删除反馈
     function deleteFeedback(id) {
-        var msg = "即将删除反馈：" + id + "，删除后将无法恢复，确认执行？";
-        if (confirm(msg)) {
+        layer.confirm("即将删除反馈：" + id + "，删除后反馈将无法恢复，确认执行？", {
+            btn: ['确定','取消']
+        }, function(){
             sendArray("post", "/admin/feedback/delete", {"ids": id}, false, function (res) {
                 // 当操作成功时，刷新表格
-                if (res.status) {
+                if(res.status) {
+                    layer.msg("操作成功",{icon:1});
                     flushTable();
+                } else {
+                    layer.msg("操作失败",{icon:2});
                 }
             }, function () {
-                $.message({message: '未知错误', type: 'error'});
+                layer.msg("未知错误",{icon:2});
             });
-        }
+        }, function(){
+        });
     }
 </script>
 </body>

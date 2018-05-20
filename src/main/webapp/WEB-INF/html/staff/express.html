@@ -6,10 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
 
-    <link rel="stylesheet" href="../../../css/bootstrap.css"/>
-    <link rel="stylesheet" href="../../../css/bootstrap-table.css"/>
-    <link rel="stylesheet" href="../../../css/message.css"/>
-    <link rel="stylesheet" href="../../../css/express.css">
+    <link rel="stylesheet" href="../../../assets/css/bootstrap.css"/>
+    <link rel="stylesheet" href="../../../assets/css/bootstrap-table.css"/>
+    <link rel="stylesheet" href="../../../assets/css/express.css">
 </head>
 <body>
 <div class="container-fluid">
@@ -150,37 +149,6 @@
                     </div>
                 </div>
             </div>
-            <!-- 异常订单模态框 -->
-            <div class="modal fade" id="errorModel" tabindex="-1" role="dialog" aria-labelledby="errorModelLabel">
-                <div class="modal-dialog" role="document">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                            <h4 class="modal-title" id="errorModelLabel">异常订单</h4>
-                        </div>
-                        <div class="modal-body">
-                            <form class="form-horizontal">
-                                <div class="form-group">
-                                    <label class="col-sm-2 control-label">订单号：</label>
-                                    <div class="col-sm-10">
-                                        <p class="form-control-static" id="errorExpressIds"></p>
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <label for="inputErrorText" class="col-sm-2 control-label">错误信息</label>
-                                    <div class="col-sm-10">
-                                        <textarea class="form-control" id="inputErrorText" rows="3"></textarea>
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-primary" id="errorBtn">设置</button>
-                            <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
             <!-- 订单详情模态框 -->
             <div class="modal fade" id="infoModel" tabindex="-1" role="dialog" aria-labelledby="infoModelLabel">
                 <div class="modal-dialog" role="document">
@@ -276,14 +244,14 @@
     </div>
 </div>
 
-<script src="../../../js/jquery3.3.1.min.js"></script>
-<script src="../../../js/bootstrap.min.js"></script>
-<script src="../../../js/bootstrap-table.min.js"></script>
-<script src="../../../js/bootstrap-table-zh-CN.min.js"></script>
-<script src="../../../js/bootstrap-table-export.min.js"></script>
-<script src="../../../js/tableExport.min.js"></script>
-<script src="../../../js/message.js"></script>
-<script src="../../../js/http.js"></script>
+<script src="../../../assets/js/jquery3.3.1.min.js"></script>
+<script src="../../../assets/js/bootstrap.min.js"></script>
+<script src="../../../assets/js/bootstrap-table.min.js"></script>
+<script src="../../../assets/js/bootstrap-table-zh-CN.min.js"></script>
+<script src="../../../assets/js/bootstrap-table-export.min.js"></script>
+<script src="../../../assets/js/tableExport.min.js"></script>
+<script src="../../../assets/layer/layer.js"></script>
+<script src="../../../assets/js/http.js"></script>
 <script type="text/javascript">
     $(function () {
         //1、初始化Table
@@ -300,7 +268,7 @@
                 $("#showUser").text(res.data);
             }
         }, function () {
-            $.message({message: '未知错误', type: 'error'});
+            layer.msg("未知错误",{icon:2});
         });
 
         // 初始化订单状态下拉框
@@ -313,7 +281,7 @@
                 document.getElementById("inputStatus").innerHTML = html;
             }
         }, function () {
-            $.message({message: '未知错误', type: 'error'});
+            layer.msg("未知错误",{icon:2});
         });
     });
 
@@ -367,7 +335,8 @@
                     title: '下单时间'
                 }, {
                     field: 'statusName',
-                    title: '订单状态'
+                    title: '订单状态',
+                    formatter: statusFormatter
                 }, {
                     field: 'id',
                     title: '操作',
@@ -415,30 +384,24 @@
                         }
                     }
                     if (ids.length === 0) {
-                        $.message({message: "选中的没有可异常的订单", type: "warning"});
+                        layer.msg("选中的没有可异常的订单",{icon:0});
                         return false;
                     } else {
-                        var msg = "即将异常订单：" + ids + "，确认执行？";
-                        if(!confirm(msg)) {
-                            return false;
-                        }
-
-                        // 显示异常订单模态框
-                        $("#errorExpressIds").text(ids);
-                        $("#errorModel").modal("show");
-
-                        // 点击模态框设置按钮后
-                        $("#errorBtn").click(function () {
-                            $("#errorModel").modal("hide");
-                            var text = $("#inputErrorText").val();
-                            sendArray("post", "/staff/express/error", {"ids": ids, "text":text}, false, function (res) {
-                                // 当操作成功时，刷新表格
-                                if(res.status) {
-                                    flushTable();
-                                }
-                            }, function () {
-                                $.message({message: '未知错误', type: 'error'});
+                        layer.confirm("即将异常订单：" + ids + "，确认执行？", {
+                            btn: ['确定','取消']
+                        }, function(){
+                            layer.prompt({title:"异常信息"},function(val, index) {
+                                sendArray("post", "/staff/express/error", {"ids": ids, "text":val}, false, function (res) {
+                                    if(res.status) {
+                                        layer.msg("操作成功",{icon:1});
+                                        layer.close(index);
+                                        flushTable();
+                                    }
+                                }, function () {
+                                    layer.msg("未知错误",{icon:2});
+                                });
                             });
+                        }, function(){
                         });
                     }
                 }
@@ -452,6 +415,17 @@
         var result = '<button class="btn btn-xs btn-info" onclick="showExpress('+id+')" title="查看"><span class="glyphicon glyphicon-search"></span></button>\n' +
             '         <button class="btn btn-xs btn-primary" onclick="confirmExpress('+id+')" title="确认"><span class="glyphicon glyphicon-ok"></span></button>';
         return result;
+    }
+    // 订单状态的格式化
+    function statusFormatter(value, row, index) {
+        if(value === '订单异常')
+            return '<span style="color:red">'+value+'</span>';
+        else if (value === '订单完成')
+            return '<span style="color:olivedrab">'+value+'</span>';
+        else if (value === '派送中')
+            return '<span style="color:#42afff">'+value+'</span>';
+        else if (value === '等待派送')
+            return '<span style="color:grey">'+value+'</span>';
     }
     
     function flushTable() {
@@ -479,10 +453,10 @@
 
                 $("#infoModel").modal("show");
             } else {
-                $.message({message: '获取订单详情失败', type: 'error'});
+                layer.msg("获取订单详情失败",{icon:2});
             }
         }, function () {
-            $.message({message: '未知错误', type: 'error'});
+            layer.msg("未知错误",{icon:2});
         });
     }
 
@@ -501,16 +475,16 @@
 
                     $("#confirmModel").modal("show");
                 } else {
-                    $.message({message: '获取订单详情失败', type: 'error'});
+                    layer.msg("获取订单详情失败",{icon:0});
                 }
             }, function () {
-                $.message({message: '未知错误', type: 'error'});
+                layer.msg("未知错误",{icon:2});
             });
 
             $("#confirmBtn").click(function () {
                 var offlinePayment = $("#confirmPaymentOffline").val();
                 if(offlinePayment === "") {
-                    $.message({message: '线下支付金额不能为空', type: 'warning'});
+                    layer.msg("线下支付金额不能为空",{icon:0});
                     return false;
                 }
                 $("#confirmModel").modal("hide");
@@ -520,7 +494,7 @@
                         flushTable();
                     }
                 }, function () {
-                    $.message({message: '未知错误', type: 'error'});
+                    layer.msg("未知错误",{icon:2});
                 });
             });
         }

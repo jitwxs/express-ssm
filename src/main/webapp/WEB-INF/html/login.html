@@ -5,16 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <title>登陆 - 快递代拿系统</title>
-
-    <link rel="stylesheet" href="../../css/bootstrap.css"/>
-    <link rel="stylesheet" href="../../css/message.css"/>
-    <link rel="stylesheet" href="../../css/login.css"/>
-    <script src="../../js/jquery3.3.1.min.js"></script>
-    <script src="../../js/bootstrap.min.js"></script>
-    <script src="../../js/message.js"></script>
-    <script src="../../js/http.js"></script>
+    <link rel="stylesheet" href="../../assets/css/bootstrap.css"/>
+    <link rel="stylesheet" href="../../assets/css/login.css"/>
 </head>
 <body>
+
 <div class="container">
     <div class="row">
         <div class="col-md-offset-3 col-md-6">
@@ -38,6 +33,10 @@
     </div>
 </div>
 
+<script src="../../assets/js/jquery3.3.1.min.js"></script>
+<script src="../../assets/js/bootstrap.min.js"></script>
+<script src="../../assets/layer/layer.js"></script>
+<script src="../../assets/js/http.js"></script>
 <script>
     function refresh(obj) {
         obj.src = "getVerifyCode?" + Math.random();
@@ -51,26 +50,26 @@
         var username = $("#username").val();
         var password = $("#password").val();
         if(username === "" || password === "") {
-            $.message({message: "用户名或密码不能为空", type: "warning"});
+            layer.msg("用户名或密码不能为空",{icon:0});
             return false;
         }
 
         sendJson("post", "/checkVerifyCode", {"data": $("#inputVerify").val()}, false, function (res) {
             if (!res.status) {
-                $.message({message: res.info, type: 'error'});
+                layer.msg(res.info,{icon:2});
             } else {
                 sendJson("post", "/login", {"username":username,"password":password}, false, function (res) {
                     if (!res.status) {
-                        $.message({message: res.info, type: 'error'});
+                        layer.msg(res.info,{icon:2});
                     } else {
                         window.location.href=res.data;
                     }
                 }, function () {
-                    $.message({message: '未知错误', type: 'error'});
+                    layer.msg("未知错误",{icon:2});
                 });
             }
         }, function () {
-            $.message({message: '未知错误', type: 'error'});
+            layer.msg("未知错误",{icon:2});
         });
     }
 </script>

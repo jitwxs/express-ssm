@@ -5,32 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <title>订单支付 - 快递代拿系统</title>
-    <link rel="stylesheet" href="../../css/bootstrap.css"/>
-    <link rel="stylesheet" href="../../css/message.css"/>
-    <link rel="stylesheet" href="../../css/express.css"/>
+    <link rel="stylesheet" href="../../assets/css/bootstrap.css"/>
+    <link rel="stylesheet" href="../../assets/css/express.css"/>
 </head>
 <body>
 <div class="container">
     <!-- 导航栏 -->
     <nav class="navbar navbar-default">
-        <div class="container-fluid">
-            <div class="navbar-header">
-                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
-                        data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
-                    <span class="sr-only">Toggle navigation</span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
-                <a class="navbar-brand">快递代拿信息填写</a>
-            </div>
-            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-                <ul class="nav navbar-nav navbar-right">
-                    <li><a href="/search">查询中心</a></li>
-                    <li><a href="/feedback">意见反馈</a></li>
-                    <li><a href="/login">登陆系统</a></li>
-                </ul>
-            </div>
+        <div class="collapse navbar-collapse">
+            <a class="navbar-brand">快递代拿信息填写</a>
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="/search">查询中心</a></li>
+                <li><a href="/feedback">意见反馈</a></li>
+                <li><a href="/login">登陆系统</a></li>
+            </ul>
         </div>
     </nav>
     <!-- 主体部分 -->
@@ -105,7 +93,7 @@
                             <div class="panel panel-info">
                                 <div class="panel-body">
                                     <div>
-                                        <img src="../../images/alipay.png" alt="支付宝付款码" class="img-rounded pay-qrcode col-sm-6">
+                                        <img src="../../assets/images/alipay.png" alt="支付宝付款码" class="img-rounded pay-qrcode col-sm-6">
                                         <label class="col-sm-6 col-sm-offset-6">扫描左侧二维码并支付<span class="red-span" lang="totalPrice">0.00</span> 元</label>
                                     </div>
                                     <input class="form-control" id="ali_num" type="text" placeholder="请复制支付宝支付订单号">
@@ -120,7 +108,7 @@
                             <div class="panel panel-info">
                                 <div class="panel-body">
                                     <div>
-                                        <img src="../../images/weixin.jpg" alt="微信付款码" class="img-rounded pay-qrcode col-sm-6">
+                                        <img src="../../assets/images/weixin.jpg" alt="微信付款码" class="img-rounded pay-qrcode col-sm-6">
                                         <label class="col-sm-6 col-sm-offset-6">扫描左侧二维码并支付<span class="red-span" lang="totalPrice">0.00</span> 元</label>
                                     </div>
                                     <input class="form-control" id="wechat_num" type="text" placeholder="请复制微信支付订单号">
@@ -149,16 +137,16 @@
         </div>
     </div>
 </div>
-<script src="../../js/jquery3.3.1.min.js"></script>
-<script src="../../js/bootstrap.min.js"></script>
-<script src="../../js/message.js"></script>
-<script src="../../js/http.js"></script>
+<script src="../../assets/js/jquery3.3.1.min.js"></script>
+<script src="../../assets/js/bootstrap.min.js"></script>
+<script src="../../assets/layer/layer.js"></script>
+<script src="../../assets/js/http.js"></script>
 <script>
     var express,total=0;
     $(function () {
         sendJson("get", "/payment/express", {}, false, function (res) {
             if (!res.status) {
-                $.message({message: res.info, type: 'error'});
+                layer.msg(res.info,{icon:2});
             } else {
                 express = res.data;
                 $("#expressName").text(express.name);
@@ -168,7 +156,7 @@
                 $("#expressRemark").text(express.remark);
             }
         }, function () {
-            $.message({message: '未知错误', type: 'error'});
+            layer.msg("未知错误",{icon:2});
         });
     });
 
@@ -222,12 +210,12 @@
     function closeExpress() {
         sendJson("get", "/payment/close", {}, false, function (res) {
             if (!res.status) {
-                $.message({message: res.info, type: 'error'});
+                layer.msg(res.info,{icon:2});
             } else {
                 window.location.href = res.data;
             }
         }, function () {
-            $.message({message: '未知错误', type: 'error'});
+            layer.msg("未知错误",{icon:2});
         });
     }
 
@@ -239,12 +227,12 @@
 
         sendJson("post", "/payment", {"time":express.createDate,"type":type,"money":total,"num":num}, false, function (res) {
             if (!res.status) {
-                $.message({message: res.info, type: 'error'});
+                layer.msg(res.info,{icon:2});
             } else {
                 window.location.href = res.data;
             }
         }, function () {
-            $.message({message: '未知错误', type: 'error'});
+            layer.msg("未知错误",{icon:2});
         });
     }
     
@@ -252,7 +240,7 @@
         // type = 2
         var num = $("#ali_num").val();
         if(num === "") {
-            $.message({message: '订单号不能为空', type: 'warning'});
+            layer.msg("订单号不能为空",{icon:0});
             return false;
         }
         payment(2,num);
@@ -262,7 +250,7 @@
         // type = 1
         var num = $("#wechat_num").val();
         if(num === "") {
-            $.message({message: '订单号不能为空', type: 'warning'});
+            layer.msg("订单号不能为空",{icon:0});
             return false;
         }
         payment(1,num);

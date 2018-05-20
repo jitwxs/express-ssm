@@ -2,7 +2,7 @@
 
 ### 使用技术
 
-采用Spring + SpringMVC + MyBatisPlu技术，连接池采用Druid，安全框架使用Shiro，前端采用Bootstrap实现。
+采用Spring + SpringMVC + MyBatisPlus，连接池采用Druid，安全框架使用Shiro，前端采用Bootstrap+layer实现。
 
 ### 运行环境
 

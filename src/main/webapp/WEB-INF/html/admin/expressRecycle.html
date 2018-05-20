@@ -6,10 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
 
-    <link rel="stylesheet" href="../../../css/bootstrap.css"/>
-    <link rel="stylesheet" href="../../../css/bootstrap-table.css"/>
-    <link rel="stylesheet" href="../../../css/message.css"/>
-    <link rel="stylesheet" href="../../../css/express.css">
+    <link rel="stylesheet" href="../../../assets/css/bootstrap.css"/>
+    <link rel="stylesheet" href="../../../assets/css/bootstrap-table.css"/>
+    <link rel="stylesheet" href="../../../assets/css/express.css">
 </head>
 <body>
 <div class="container-fluid">
@@ -203,14 +202,14 @@
     </div>
 </div>
 
-<script src="../../../js/jquery3.3.1.min.js"></script>
-<script src="../../../js/bootstrap.min.js"></script>
-<script src="../../../js/bootstrap-table.min.js"></script>
-<script src="../../../js/bootstrap-table-zh-CN.min.js"></script>
-<script src="../../../js/bootstrap-table-export.min.js"></script>
-<script src="../../../js/tableExport.min.js"></script>
-<script src="../../../js/message.js"></script>
-<script src="../../../js/http.js"></script>
+<script src="../../../assets/js/jquery3.3.1.min.js"></script>
+<script src="../../../assets/js/bootstrap.min.js"></script>
+<script src="../../../assets/js/bootstrap-table.min.js"></script>
+<script src="../../../assets/js/bootstrap-table-zh-CN.min.js"></script>
+<script src="../../../assets/js/bootstrap-table-export.min.js"></script>
+<script src="../../../assets/js/tableExport.min.js"></script>
+<script src="../../../assets/layer/layer.js"></script>
+<script src="../../../assets/js/http.js"></script>
 <script type="text/javascript">
     $(function () {
         //1、初始化Table
@@ -227,7 +226,7 @@
                 $("#showUser").text(res.data);
             }
         }, function () {
-            $.message({message: '未知错误', type: 'error'});
+            layer.msg("未知错误",{icon:2});
         });
 
         // 初始化订单状态下拉框
@@ -240,7 +239,7 @@
                 document.getElementById("inputStatus").innerHTML = html;
             }
         }, function () {
-            $.message({message: '未知错误', type: 'error'});
+            layer.msg("未知错误",{icon:2});
         });
     });
 
@@ -332,7 +331,6 @@
 
     var ButtonInit = function () {
         var oInit = new Object();
-        var postdata = {};
 
         oInit.Init = function () {
             // 恢复订单
@@ -344,17 +342,19 @@
                         ids.push(row[i].id);
                     }
 
-                    var msg = "即将恢复订单：" + ids + "，确认执行？";
-                    if(confirm(msg)) {
+                    layer.confirm("即将恢复订单：" + ids + "，确认执行？", {
+                        btn: ['确定','取消']
+                    }, function(){
                         sendArray("post", "/admin/express/recycle", {"ids": ids}, false, function (res) {
-                            // 当操作成功时，刷新表格
                             if(res.status) {
+                                layer.msg('恢复成功', {icon: 1});
                                 flushTable();
                             }
                         }, function () {
-                            $.message({message: '未知错误', type: 'error'});
+                            layer.msg("未知错误",{icon:2});
                         });
-                    }
+                    }, function(){
+                    });
                 }
             });
 
@@ -366,17 +366,19 @@
                     for (var i = 0; i < row.length; i++) {
                         ids.push(row[i].id);
                     }
-                    var msg = "即将彻底删除订单：" + ids + "，删除后无法恢复，确认执行？";
-                    if (!confirm(msg)) {
-                        return false;
-                    }
-                    sendArray("post", "/admin/express/clean", {"ids": ids}, false, function (res) {
-                        // 当操作成功时，刷新表格
-                        if (res.status) {
-                            flushTable();
-                        }
-                    }, function () {
-                        $.message({message: '未知错误', type: 'error'});
+
+                    layer.confirm("即将彻底删除订单：" + ids + "，删除后无法恢复，确认执行？", {
+                        btn: ['确定','取消']
+                    }, function(){
+                        sendArray("post", "/admin/express/clean", {"ids": ids}, false, function (res) {
+                            if (res.status) {
+                                layer.msg("删除成功",{icon:1});
+                                flushTable();
+                            }
+                        }, function () {
+                            layer.msg("未知错误",{icon:2});
+                        });
+                    }, function(){
                     });
                 }
             });
@@ -418,41 +420,46 @@
 
                 $("#infoModel").modal("show");
             } else {
-                $.message({message: '获取订单详情失败', type: 'error'});
+                layer.msg("获取订单详情失败",{icon:2});
             }
         }, function () {
-            $.message({message: '未知错误', type: 'error'});
+            layer.msg("未知错误",{icon:2});
         });
     }
     
     // 恢复订单
     function recycleExpress(id) {
-        var msg = "即将恢复订单：" + id + "，确认执行？";
-        if(confirm(msg)) {
+        layer.confirm("即将恢复订单：" + id + "，确认执行？", {
+            btn: ['确定','取消']
+        }, function(){
             sendArray("post", "/admin/express/recycle", {"ids": id}, false, function (res) {
                 // 当操作成功时，刷新表格
                 if(res.status) {
+                    layer.msg("恢复成功",{icon:1});
                     flushTable();
                 }
             }, function () {
-                $.message({message: '未知错误', type: 'error'});
+                layer.msg("未知错误",{icon:2});
             });
-        }
+        }, function(){
+        });
     }
 
     // 删除订单
     function deleteExpress(id) {
-        var msg = "即将彻底删除订单：" + id + "，删除后无法恢复，确认执行？";
-        if (confirm(msg)) {
+        layer.confirm("即将彻底删除订单：" + id + "，删除后无法恢复，确认执行？", {
+            btn: ['确定','取消']
+        }, function(){
             sendArray("post", "/admin/express/clean", {"ids": id}, false, function (res) {
-                // 当操作成功时，刷新表格
                 if (res.status) {
+                    layer.msg("删除成功",{icon:1});
                     flushTable();
                 }
             }, function () {
-                $.message({message: '未知错误', type: 'error'});
+                layer.msg("未知错误",{icon:2});
             });
-        }
+        }, function(){
+        });
     }
 </script>
 </body>
