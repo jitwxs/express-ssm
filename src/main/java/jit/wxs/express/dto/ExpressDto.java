@@ -26,7 +26,10 @@ public class ExpressDto extends Express {
      * 订单支付方式
      */
     private String paymentType;
-
+    /**
+     *订单支付状态
+     */
+    private String paymentStatus;
     /**
      * 线上支付金额
      */
@@ -35,6 +38,14 @@ public class ExpressDto extends Express {
      * 线下支付金额
      */
     private Double offlinePayment;
+
+    public String getPaymentStatus() {
+        return paymentStatus;
+    }
+
+    public void setPaymentStatus(String paymentStatus) {
+        this.paymentStatus = paymentStatus;
+    }
 
     public String getStatusName() {
         return statusName;

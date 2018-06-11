@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+http://www.springframework.org/schema/beans/spring-beans.xsd
+http://www.springframework.org/schema/context
+http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <!-- 加载配置文件 -->
+    <context:property-placeholder location="classpath:conf/*.properties"/>
+
+    <bean id="alipaySetting" class="jit.wxs.express.alipay.AliPaySetting">
+        <property name="serverUrl" value="${alipay.gateway_url}"/>
+        <property name="appId" value="${alipay.app_id}"/>
+        <property name="privateKey" value="${alipay.merchant_private_key}"/>
+        <property name="alipayPublicKey" value="${alipay.alipay_public_key}"/>
+        <property name="signType" value="${alipay.sign_type}"/>
+        <property name="sellerId" value="${alipay.uid}"/>
+        <property name="notifyUrl" value="${alipay.notify_url}"/>
+        <property name="returnUrl" value="${alipay.return_url}"/>
+    </bean>
+
+    <bean id="alipayClient" class="com.alipay.api.DefaultAlipayClient">
+        <constructor-arg name="serverUrl" value="${alipay.gateway_url}"/>
+        <constructor-arg name="appId" value="${alipay.app_id}"/>
+        <constructor-arg name="privateKey" value="${alipay.merchant_private_key}"/>
+        <constructor-arg name="format" value="json"/>
+        <constructor-arg name="charset" value="utf-8"/>
+        <constructor-arg name="alipayPublicKey" value="${alipay.alipay_public_key}"/>
+        <constructor-arg name="signType" value="${alipay.sign_type}"/>
+    </bean>
+</beans>

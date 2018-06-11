@@ -30,6 +30,10 @@ public class ExpressPayment implements Serializable {
      */
     private Integer type;
     /**
+     * 支付状态
+     */
+    private Integer status;
+    /**
      * 线上支付金额
      */
     private Double onlinePayment;
@@ -37,6 +41,10 @@ public class ExpressPayment implements Serializable {
      * 线上支付第三方的流水号
      */
     private String onlinePaymentNum;
+    /**
+     * 线上收款方
+     */
+    private String onlineSeller;
     /**
      * 线下支付金额
      */
@@ -68,6 +76,14 @@ public class ExpressPayment implements Serializable {
         this.type = type;
     }
 
+    public Integer getStatus() {
+        return status;
+    }
+
+    public void setStatus(Integer status) {
+        this.status = status;
+    }
+
     public Double getOnlinePayment() {
         return onlinePayment;
     }
@@ -82,6 +98,14 @@ public class ExpressPayment implements Serializable {
 
     public void setOnlinePaymentNum(String onlinePaymentNum) {
         this.onlinePaymentNum = onlinePaymentNum;
+    }
+
+    public String getOnlineSeller() {
+        return onlineSeller;
+    }
+
+    public void setOnlineSeller(String onlineSeller) {
+        this.onlineSeller = onlineSeller;
     }
 
     public Double getOfflinePayment() {

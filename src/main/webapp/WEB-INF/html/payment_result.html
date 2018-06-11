@@ -33,7 +33,7 @@
             </div>
             <div style="margin-top: 50px;">
                 <a href="/">返回首页</a>
-                <a href="#">查询进度</a>
+                <a href="/search">查询进度</a>
             </div>
         </div>
     </div>
@@ -45,7 +45,7 @@
     $(function () {
         sendJson("get", "/payment/result/info", {}, false, function (res) {
             if (!res.status) {
-                layer.msg("订单已失效，请刷新页面。如无法解决，请重新下单",{icon:2});
+                layer.msg("订单已失效，请刷新页面。如无法解决，请联系客服",{icon:2});
             } else {
                 var payment = res.data;
                 $("#expressId").text(payment.expressId);

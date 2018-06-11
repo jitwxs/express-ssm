@@ -45,11 +45,17 @@ public class SystemController {
      */
     @PostMapping("/checkVerifyCode")
     public Msg checkVerifyCode(String data, HttpServletRequest request) {
-        String validateCode = ((String) request.getSession().getAttribute("validateCode")).toLowerCase();
+        String validateCode;
+        try {
+            validateCode = ((String) request.getSession().getAttribute("validateCode")).toLowerCase();
+        } catch (NullPointerException e) {
+            return Msg.error("验证码初始化错误，请刷新页面重试");
+        }
+
         String value = data.toLowerCase();
 
         if(!validateCode.equals(value)) {
-            return Msg.error("验证码错误");
+            return Msg.error("验证码输入错误");
         } else {
             return Msg.ok();
         }

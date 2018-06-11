@@ -13,7 +13,7 @@
     <!-- 导航栏 -->
     <nav class="navbar navbar-default">
         <div class="collapse navbar-collapse">
-            <a class="navbar-brand">快递代拿信息填写</a>
+            <a class="navbar-brand" href="/">快递代拿信息填写</a>
             <ul class="nav navbar-nav navbar-right">
                 <li><a href="/search">查询中心</a></li>
                 <li><a href="/feedback">意见反馈</a></li>
@@ -79,59 +79,16 @@
             </div>
 
             <div class="col-sm-12 pt10">
-                <h4>支付方式</h4>
-                <form class="form-horizontal">
-                    <!-- Nav tabs -->
-                    <ul class="nav nav-tabs" role="tablist">
-                        <li role="presentation" class="active"><a href="#alipay_tab" aria-controls="alipay" role="tab" data-toggle="tab">支付宝支付</a></li>
-                        <li role="presentation"><a href="#wechat_tab" aria-controls="weixin" role="tab" data-toggle="tab">微信支付</a></li>
-                        <li role="presentation"><a href="#onlineOff_tab" aria-controls="onlineOff" role="tab" data-toggle="tab">线下支付</a></li>
-                    </ul>
-                    <!-- Tab panes -->
-                    <div class="tab-content">
-                        <div role="tabpanel" class="tab-pane fade in active" id="alipay_tab">
-                            <div class="panel panel-info">
-                                <div class="panel-body">
-                                    <div>
-                                        <img src="../../assets/images/alipay.png" alt="支付宝付款码" class="img-rounded pay-qrcode col-sm-6">
-                                        <label class="col-sm-6 col-sm-offset-6">扫描左侧二维码并支付<span class="red-span" lang="totalPrice">0.00</span> 元</label>
-                                    </div>
-                                    <input class="form-control" id="ali_num" type="text" placeholder="请复制支付宝支付订单号">
-                                </div>
-                                <div class="panel-footer">
-                                    <button type="button" class="btn btn-info" onclick="alipay()">完成支付</button>
-                                    <button type="button" class="btn btn-warning" onclick="closeExpress()" style="float: right">放弃订单</button>
-                                </div>
-                            </div>
-                        </div>
-                        <div role="tabpanel" class="tab-pane fade" id="wechat_tab">
-                            <div class="panel panel-info">
-                                <div class="panel-body">
-                                    <div>
-                                        <img src="../../assets/images/weixin.jpg" alt="微信付款码" class="img-rounded pay-qrcode col-sm-6">
-                                        <label class="col-sm-6 col-sm-offset-6">扫描左侧二维码并支付<span class="red-span" lang="totalPrice">0.00</span> 元</label>
-                                    </div>
-                                    <input class="form-control" id="wechat_num" type="text" placeholder="请复制微信支付订单号">
-                                </div>
-                                <div class="panel-footer">
-                                    <button type="button" class="btn btn-info" onclick="wechatpay()">完成支付</button>
-                                    <button type="button" class="btn btn-warning" onclick="closeExpress()" style="float: right">放弃订单</button>
-                                </div>
-                            </div>
-                        </div>
-                        <div role="tabpanel" class="tab-pane fade" id="onlineOff_tab">
-                            <div class="panel panel-info">
-                                <div class="panel-body">
-                                    <label>为了您能快速取件，推荐您使用线上支付，线下支付请在取件时付款</label><br>
-                                    <label>请提前准备现金 <span class="red-span" lang="totalPrice">0.00</span> 元</label>
-                                </div>
-                                <div class="panel-footer">
-                                    <button type="button" class="btn btn-info" onclick="onlineOffpay()">完成支付</button>
-                                    <button type="button" class="btn btn-warning" onclick="closeExpress()" style="float: right">放弃订单</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                <h4>支付方式（在线方式至少付款0.01元）</h4>
+                <form class="form-inline col-sm-4" id="alipayForm" action="/payment/alipay" method="post">
+                    <input type="hidden" id="alipayMoney" name="money">
+                    <button class="btn btn-info" type="button" onclick="alipay()">支付宝支付</button>
+                </form>
+                <form class="form-inline col-sm-4" id="wechatForm" action="/payment/wechat" method="post">
+                    <button class="btn btn-default" type="button" disabled>微信支付</button>
+                </form>
+                <form class="form-inline col-sm-2">
+                    <button class="btn btn-default" type="button" onclick="OfflinePay()">线下支付</button>
                 </form>
             </div>
         </div>
@@ -206,59 +163,41 @@
         updatePrice();
     }
 
-    // 关闭订单
-    function closeExpress() {
-        sendJson("get", "/payment/close", {}, false, function (res) {
-            if (!res.status) {
-                layer.msg(res.info,{icon:2});
-            } else {
-                window.location.href = res.data;
-            }
-        }, function () {
-            layer.msg("未知错误",{icon:2});
-        });
-    }
-
-    function payment(type,num) {
+    // 判断订单是否存在
+    function checkExpressValid() {
         if(express == null) {
-            $.message({message: "订单已失效，请刷新页面。如无法解决，请重新下单", type: 'error'});
+            layer.msg("订单已失效，请刷新页面。如无法解决，请重新下单",{icon:2});
             return false;
         }
+        return true;
+    }
 
-        sendJson("post", "/payment", {"time":express.createDate,"type":type,"money":total,"num":num}, false, function (res) {
-            if (!res.status) {
-                layer.msg(res.info,{icon:2});
-            } else {
-                window.location.href = res.data;
+    function OfflinePay() {
+        layer.confirm("您选择了线下支付方式，请准备好现金。是否确认下单？", {
+            btn: ['确定','取消']
+        }, function(){
+            if(checkExpressValid()) {
+                sendJson("post", "/payment/offline", {"money":total}, false, function (res) {
+                    if (!res.status) {
+                        layer.msg(res.info,{icon:2});
+                    } else {
+                        window.location.href = res.data;
+                    }
+                }, function () {
+                    layer.msg("未知错误",{icon:2});
+                });
             }
-        }, function () {
-            layer.msg("未知错误",{icon:2});
+        }, function(){
         });
     }
     
     function alipay() {
-        // type = 2
-        var num = $("#ali_num").val();
-        if(num === "") {
-            layer.msg("订单号不能为空",{icon:0});
-            return false;
+        if(checkExpressValid()) {
+            if(total === 0)
+                total = 0.01;
+            $("#alipayMoney").val(total);
+            $("#alipayForm").submit();
         }
-        payment(2,num);
-    }
-    
-    function wechatpay() {
-        // type = 1
-        var num = $("#wechat_num").val();
-        if(num === "") {
-            layer.msg("订单号不能为空",{icon:0});
-            return false;
-        }
-        payment(1,num);
-    }
-    
-    function onlineOffpay() {
-        // type = 0
-        payment(0,null);
     }
 </script>
 </body>

@@ -23,7 +23,7 @@ public class Express implements Serializable {
     /**
      * 订单号
      */
-    @TableId(type = IdType.ID_WORKER_STR)
+    @TableId(type = IdType.INPUT)
     private String id;
     /**
      * 姓名

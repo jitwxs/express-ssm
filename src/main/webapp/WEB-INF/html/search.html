@@ -73,6 +73,12 @@
                         </div>
                     </div>
                     <div class="form-group">
+                        <label for="expressPaymentStatus" class="col-sm-2 control-label">支付状态</label>
+                        <div class="col-sm-10">
+                            <p class="form-control-static" id="expressPaymentStatus" style="color:red;"></p>
+                        </div>
+                    </div>
+                    <div class="form-group">
                         <label for="expressOnline" class="col-sm-2 control-label">线上支付金额</label>
                         <div class="col-sm-10">
                             <p class="form-control-static" id="expressOnline"></p>
@@ -213,6 +219,7 @@
                     $("#expressMessage").text(express.message);
                     $("#expressRemark").text(express.remark);
                     $("#expressPaymentType").text(express.paymentType);
+                    $("#expressPaymentStatus").text(express.paymentStatus);
                     $("#expressOnline").text(express.onlinePayment);
                     $("#expressOffline").text(express.offlinePayment);
 
