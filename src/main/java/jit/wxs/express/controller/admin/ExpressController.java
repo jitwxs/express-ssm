@@ -59,7 +59,7 @@ public class ExpressController {
      * @since 2018/5/2 0:33
      */
     @GetMapping("/list")
-    public Map listExpress(Integer rows, Integer page, ExpressSelectWrapper esw) {
+    public Map listExpress(Integer rows, Integer page, ExpressSelectWrapper esw, @RequestParam(defaultValue = "createDate") String order) {
         // Get请求中文编码
         try {
             esw.setName(globalFunction.iso8859ToUtf8(esw.getName()));
@@ -70,11 +70,11 @@ public class ExpressController {
         }
         // 得到筛选条件
         EntityWrapper<Express> expressWrapper = globalFunction.getExpressWrapper(esw);
-        Page<Express> selectPage = expressService.selectPage(new Page<>(page, rows), expressWrapper);
+        Page<Express> selectPage = expressService.selectPage(new Page<>(page, rows, order, false), expressWrapper);
 
         List<ExpressDto> list = globalFunction.express2dto(selectPage.getRecords());
 
-        Map<String,Object> map = new HashMap<>();
+        Map<String,Object> map = new HashMap<>(16);
         map.put("total", selectPage.getTotal());
         map.put("rows", list);
         return map;

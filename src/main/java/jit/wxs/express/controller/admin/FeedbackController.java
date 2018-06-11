@@ -12,10 +12,7 @@ import jit.wxs.express.service.FeedbackService;
 import jit.wxs.express.service.SysUserService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
@@ -61,7 +58,7 @@ public class FeedbackController {
      * @since 2018/5/14 14:35
      */
     @GetMapping("/list")
-    public Map listFeedback(Integer rows, Integer page, FeedbackSelectWrapper fsw) {
+    public Map listFeedback(Integer rows, Integer page, FeedbackSelectWrapper fsw, @RequestParam(defaultValue = "createDate") String order) {
         // Get请求中文编码
         try {
             fsw.setName(globalFunction.iso8859ToUtf8(fsw.getName()));
@@ -71,7 +68,7 @@ public class FeedbackController {
         }
         // 得到筛选条件
         EntityWrapper<Feedback> feedbackWrapper = globalFunction.getFeedbackWrapper(fsw);
-        Page<Feedback> selectPage = feedbackService.selectPage(new Page<>(page, rows), feedbackWrapper);
+        Page<Feedback> selectPage = feedbackService.selectPage(new Page<>(page, rows,order,false), feedbackWrapper);
 
         List<FeedbackDto> list = globalFunction.feedback2dto(selectPage.getRecords());
 

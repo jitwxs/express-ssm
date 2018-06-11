@@ -57,7 +57,7 @@ public class StaffExpressController {
      * @since 2018/5/14 17:39
      */
     @RequestMapping("/list")
-    public Map listExpress(Integer rows, Integer page, ExpressSelectWrapper esw) {
+    public Map listExpress(Integer rows, Integer page, ExpressSelectWrapper esw, @RequestParam(defaultValue = "createDate") String order) {
         // Get请求中文编码
         try {
             esw.setName(globalFunction.iso8859ToUtf8(esw.getName()));
@@ -70,7 +70,7 @@ public class StaffExpressController {
         EntityWrapper<Express> expressWrapper = globalFunction.getExpressWrapper(esw);
         // 设置仅查找等待接单的订单
         expressWrapper.eq("status", ExpressStatusEnum.WAIT_DIST.getIndex());
-        Page<Express> selectPage = expressService.selectPage(new Page<>(page, rows), expressWrapper);
+        Page<Express> selectPage = expressService.selectPage(new Page<>(page, rows,order,false), expressWrapper);
 
         List<ExpressDto> list = globalFunction.express2dto(selectPage.getRecords());
 
@@ -86,7 +86,7 @@ public class StaffExpressController {
      * @since 2018/5/14 17:39
      */
     @RequestMapping("/selfList")
-    public Map listSelfExpress(Integer rows, Integer page, ExpressSelectWrapper esw) {
+    public Map listSelfExpress(Integer rows, Integer page, ExpressSelectWrapper esw, @RequestParam(defaultValue = "createDate") String order) {
         // Get请求中文编码
         try {
             esw.setName(globalFunction.iso8859ToUtf8(esw.getName()));
@@ -98,7 +98,7 @@ public class StaffExpressController {
         EntityWrapper<Express> expressWrapper = globalFunction.getExpressWrapper(esw);
         // 设置查找当前用户的订单
         expressWrapper.eq("staff", globalFunction.getUserId());
-        Page<Express> selectPage = expressService.selectPage(new Page<>(page, rows), expressWrapper);
+        Page<Express> selectPage = expressService.selectPage(new Page<>(page, rows, order, false), expressWrapper);
 
         List<ExpressDto> list = globalFunction.express2dto(selectPage.getRecords());
 

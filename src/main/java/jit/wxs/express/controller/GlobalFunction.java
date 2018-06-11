@@ -75,7 +75,9 @@ public class GlobalFunction {
             if(payment.getOfflinePayment() != null) {
                 dto.setOfflinePayment(payment.getOfflinePayment());
             }
-            dto.setPaymentStatus(PaymentStatusEnum.getName(payment.getStatus()));
+            if(payment.getStatus() != null) {
+                dto.setPaymentStatus(PaymentStatusEnum.getName(payment.getStatus()));
+            }
         }
         return dto;
     }
