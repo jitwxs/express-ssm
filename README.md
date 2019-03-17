@@ -12,7 +12,7 @@
 
 - 数据库：Mysql
 
-- DK版本：jdk1.8
+- JDK版本：jdk1.8
 
 - Tomcat版本：Tomcat8
 
