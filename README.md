@@ -7,6 +7,15 @@
 
 采用 Spring + SpringMVC + MyBatisPlus，连接池采用 Druid，安全框架使用 Shiro，前端采用 Bootstrap + layer 实现。
 
+支付采用支付宝沙箱环境，支付APP下载链接，[点击这里](https://sandbox.alipaydev.com/user/downloadApp.htm)。
+
+支付账号：uceskd4358@sandbox.com
+登录密码、支付密码：111111
+
+**注意：**
+
+请务必使用以上链接下载`沙箱支付宝`，也务必使用以上账号登录。不要使用真实支付宝APP和真实支付宝账号登录。
+
 ### 运行环境
 
 - 集成开发环境：IntelliJ IDEA
