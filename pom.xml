@@ -17,7 +17,7 @@
         <!-- 日志、单元测试、JSON包 -->
         <log4j.version>1.2.17</log4j.version>
         <junit.version>4.12</junit.version>
-        <jackson-databind.version>2.9.10.1</jackson-databind.version>
+        <jackson-databind.version>2.10.0.pr1</jackson-databind.version>
         <!-- DAO包 -->
         <druid.version>1.0.26</druid.version>
         <mysql-connector-java.version>5.1.45</mysql-connector-java.version>
