@@ -29,7 +29,7 @@
         <servlet-api.version>2.5</servlet-api.version>
         <jsp-api.version>2.0</jsp-api.version>
         <!-- Shiro -->
-        <shiro.version>1.4.0</shiro.version>
+        <shiro.version>1.10.0</shiro.version>
         <!-- Redis客户端 -->
         <jedis.version>2.9.0</jedis.version>
     </properties>
