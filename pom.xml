@@ -23,7 +23,7 @@
         <mysql-connector-java.version>5.1.45</mysql-connector-java.version>
         <mybatis-plus.version>2.1.9</mybatis-plus.version>
         <!-- Spring包 -->
-        <spring.version>5.0.4.RELEASE</spring.version>
+        <spring.version>5.2.20.RELEASE</spring.version>
         <!-- JSP包 -->
         <jstl.version>1.2</jstl.version>
         <servlet-api.version>2.5</servlet-api.version>
